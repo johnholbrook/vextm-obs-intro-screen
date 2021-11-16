@@ -10,7 +10,17 @@ const axios = require('axios');
 const jsdom = require('jsdom');
 const WebSocket = require('ws');
 
+/**
+ * @class TMScraper
+ * @classdesc Gets data from the Tournament Manager web interface through a combination of page scraping and websocket communication.
+ */
 module.exports = class TMScraper {
+    /**
+     * TMScraper constructor
+     * @param {*} addr the address of the TM server
+     * @param {*} pw TM admin password
+     * @param {*} div name of the division (as used in the web interface URLs, e.g. "division1")
+     */
     constructor(addr, pw, div){
         this.addr = addr; // TM server address
         this.pw = pw; // TM admin password
