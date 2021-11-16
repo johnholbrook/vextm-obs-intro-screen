@@ -1,0 +1,18 @@
+{
+  "name": "vextm-obs-intro-screen",
+  "version": "1.0.0",
+  "description": " Alternate \"Match Intro\" screen for VEX Tournament Manager",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "John Holbrook",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.24.0",
+    "form-data": "^4.0.0",
+    "jsdom": "^18.1.0",
+    "ws": "^8.2.3",
+    "yargs": "^17.2.1"
+  }
+}
