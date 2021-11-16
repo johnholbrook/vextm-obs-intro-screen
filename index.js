@@ -40,17 +40,15 @@ const args = yargs.command("match-intro", "Serve a match intro screen")
                   }).argv;
 
 
-async function main(){
+function main(){
     if (!args.password){
         console.error("Must specify TM admin password");
         exit();
     }
 
     let tm_scraper = new TMScraper(args.address, args.password, args['division-name']);
-    
-    tm_scraper.onMatchQueue(num => {
-        console.log(`Match queued: ${num}`);
-    });
+
+    tm_scraper.onMatchQueue(console.log);
 }
 
 main();

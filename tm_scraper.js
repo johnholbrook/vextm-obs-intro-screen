@@ -221,9 +221,9 @@ module.exports = class TMScraper {
         this.websocket.on('close', () => {
             console.log('WebSocket disconnected');
         });
-        this.websocket.on('message', event => {
+        this.websocket.on('message', async event => {
             let data = JSON.parse(event.toString());
-            this._handleEvent(data);
+            await this._handleEvent(data);
             // console.log(data);
         });
     }
@@ -231,9 +231,10 @@ module.exports = class TMScraper {
     /**
      * Handles an event from the TM server (recieved via websockets).
      */
-    _handleEvent(event){
+    async _handleEvent(event){
         if (event.type == "fieldMatchAssigned"){
-            this.onMatchQueueCallback(event.name);
+            let match_info = await this.getMatchTeams(event.name);
+            this.onMatchQueueCallback(match_info);
         }
         // there are various other event types too, but for now we only care about fieldMatchAssigned
     }
@@ -245,5 +246,70 @@ module.exports = class TMScraper {
     async onMatchQueue(callback){
         this.onMatchQueueCallback = callback;
         await this._connectWebsocket();
+    }
+
+    /**
+     * Gets info about the teams in a particular match.
+     * @param {string} match_num - the match number (e.g. "Q20")
+     */
+    async getMatchTeams(match_num){
+        // get the list of teams and matches if we don't have them yet
+        if (this.teams.length == 0){
+            await this._fetchTeams();
+        }
+        if (this.matches.length == 0){
+            await this._fetchMatches();
+        }
+
+        let match = this.matches.find(m => m.match_num == match_num);
+        if (!match){
+            // if we didn't find the match, maybe it's been created since we last fetched the list
+            await this._fetchMatches();
+            match = this.matches.find(m => m.match_num == match_num);
+            if (!match){
+                throw new Error(`Match ${match_num} not found`);
+            }
+        }
+
+        if (this.program = "VRC"){
+            return await {
+                match_num: match_num,
+                program: "VRC",
+                red_1: await this._getTeamData(match.red_1),
+                red_2: await this._getTeamData(match.red_2),
+                blue_1: await this._getTeamData(match.blue_1),
+                blue_2: await this._getTeamData(match.blue_2)
+            }
+        }
+        else if (this.program = "VEXU"){
+            return await {
+                match_num: match_num,
+                program: "VEXU",
+                red_1: await this._getTeamData(match.red_1),
+                blue_1: await this._getTeamData(match.blue_1)
+            }
+        }
+        else if (this.program = "VIQC"){
+            return await {
+                match_num: match_num,
+                program: "VIQC",
+                team_1: await this._getTeamData(match.team_1),
+                team_2: await this._getTeamData(match.team_2)
+            }
+        }
+    }
+
+    /**
+     * Gets data about a particular team.
+     * @param {string} team_num - the team number (e.g. "1234A")
+     */
+    async _getTeamData(team_num){
+        // get the list of teams if we don't have them yet
+        if (this.teams.length == 0){
+            await this._fetchTeams();
+        }
+
+        let team = this.teams.find(t => t.number == team_num);
+        return team;
     }
 }
