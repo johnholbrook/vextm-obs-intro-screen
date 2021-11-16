@@ -260,11 +260,15 @@ module.exports = class TMScraper {
             await this._fetchMatches();
         }
 
-        let match = this.matches.find(m => m.match_num == match_num);
+        // for some reason some match numbers returned from the websocket have spaces in them
+        match_num = strip(match_num);
+
+        let match = this.matches.find(m => strip(m.match_num) == match_num);
         if (!match){
             // if we didn't find the match, maybe it's been created since we last fetched the list
             await this._fetchMatches();
-            match = this.matches.find(m => m.match_num == match_num);
+            // console.log(this.matches);
+            match = this.matches.find(m => strip(m.match_num) == match_num);
             if (!match){
                 throw new Error(`Match ${match_num} not found`);
             }
