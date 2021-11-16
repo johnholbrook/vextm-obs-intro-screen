@@ -22,6 +22,7 @@ function generateTeamHTML(team) {
 function showIntro(match) {
     setProgram(match.program);
     
+    // set the team info
     if (match.program == "VRC"){
         document.querySelector("#vrc-red1").innerHTML = generateTeamHTML(match.red_1);
         document.querySelector("#vrc-red2").innerHTML = generateTeamHTML(match.red_2);
@@ -35,6 +36,20 @@ function showIntro(match) {
     else if (match.program == "VIQC"){
         document.querySelector("#viqc-team1").innerHTML = generateTeamHTML(match.team_1);
         document.querySelector("#viqc-team2").innerHTML = generateTeamHTML(match.team_2);
+    }
+
+    // show the match prediction, if applicable
+    if (match.prediction) {
+        document.querySelector("#match-prediction").style.display = "";
+        let red = round(match.prediction.red_win_probability, 1);
+        let blue = round(100 - red, 1);
+        document.querySelector("#match-prediction-bar-blue").style.width = `${blue}%`;
+        document.querySelector("#match-prediction-bar-red").style.width = `${red}%`;
+        document.querySelector("#match-prediction-bar-blue").innerHTML = `${blue}%`;
+        document.querySelector("#match-prediction-bar-red").innerHTML = `${red}%`;
+    }
+    else{
+        document.querySelector("#match-prediction").style.display = "none";
     }
 }
 
@@ -66,4 +81,14 @@ function setProgram(program) {
             viqc_intro.style.display = "";
             break;
     }
+}
+
+/**
+ * Round a number to the specified number of decimal places
+ * @param {Number} num The number to round
+ * @param {Number} decimals The number of decimal places to round to
+ * @returns {Number} The rounded number
+ */
+function round(num, decimals) {
+    return Math.round(num * Math.pow(10, decimals)) / Math.pow(10, decimals);
 }
