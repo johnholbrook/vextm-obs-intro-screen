@@ -9,7 +9,6 @@ const util = require('util');
 const axios = require('axios');
 const jsdom = require('jsdom');
 const WebSocket = require('ws');
-const { thistle } = require('color-name');
 
 module.exports = class TMScraper {
     constructor(addr, pw, div){
