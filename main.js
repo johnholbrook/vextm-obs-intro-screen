@@ -1,6 +1,7 @@
 const { exit } = require('process');
 const TMScraper = require('./tm_scraper.js');
 const server = require('./server.js');
+const vrc_match_predictor = require('./vrc_match_predictor.js');
 
 // set up command-line args
 const yargs = require('yargs');
@@ -51,7 +52,18 @@ function main(){
 
     // when a new match is queued, send the info to all connected clients
     tm_scraper.onMatchQueue(m => {
-        server.emit("match_queued", m);
+        if (m.program == "VRC" && args['show-predictions']){
+            // get the match prediction before sending info to clients
+            vrc_match_predictor.predict(m).then(prediction => {
+                m.prediction = prediction;
+                server.emit("match_queued", m);
+            });
+        }
+        else{
+            // don't get the prediction, just send the info
+            server.emit("match_queued", m);
+        }
+        
     });
 
     // start the web server
