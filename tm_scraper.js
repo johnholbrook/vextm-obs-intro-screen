@@ -111,7 +111,7 @@ module.exports = class TMScraper {
      */
     async _fetchMatches(){
         // get the program, if it hasn't been determined yet
-        console.log("Fetching matches...")
+        // console.log("Fetching matches...")
         if (!this.program){
             await this._fetchProgram();
         }
@@ -147,25 +147,25 @@ module.exports = class TMScraper {
         let cols = row.querySelectorAll('td');
         if (this.program == "VRC"){
             return {
-                match_num: cols[0].textContent,
-                red_1: cols[1].textContent,
-                red_2: cols[2].textContent,
-                blue_1: cols[3].textContent,
-                blue_2: cols[4].textContent
+                match_num: strip(cols[0].textContent),
+                red_1: strip(cols[1].textContent),
+                red_2: strip(cols[2].textContent),
+                blue_1: strip(cols[3].textContent),
+                blue_2: strip(cols[4].textContent)
             }
         }
         else if (this.program == "VEXU"){
             return {
                 match_num: cols[0].textContent,
-                red_1: cols[1].textContent,
-                blue_1: cols[2].textContent
+                red_1: strip(cols[1].textContent),
+                blue_1: strip(cols[2].textContent)
             }
         }
         else if (this.program == "VIQC"){
             return {
-                match_num: cols[0].textContent,
-                team_1: cols[1].textContent,
-                team_2: cols[2].textContent
+                match_num: strip(cols[0].textContent),
+                team_1: strip(cols[1].textContent),
+                team_2: strip(cols[2].textContent)
             }
         }
     }
@@ -174,7 +174,7 @@ module.exports = class TMScraper {
      * Determines which program is being run (VRC, VIQC, VEXU, etc.)
      */
     async _fetchProgram(){
-        console.log("Fetching program...");
+        // console.log("Fetching program...");
         let page_data = await this._makeRequest(`${this.division}/matches`);
         let page = new jsdom.JSDOM(page_data).window.document;
         let headers = page.querySelectorAll('table.table-striped > thead > tr > th');
@@ -270,7 +270,9 @@ module.exports = class TMScraper {
             }
         }
 
-        if (this.program = "VRC"){
+        // console.log(match);
+
+        if (this.program == "VRC"){
             return await {
                 match_num: match_num,
                 program: "VRC",
@@ -280,7 +282,7 @@ module.exports = class TMScraper {
                 blue_2: await this._getTeamData(match.blue_2)
             }
         }
-        else if (this.program = "VEXU"){
+        else if (this.program == "VEXU"){
             return await {
                 match_num: match_num,
                 program: "VEXU",
@@ -288,7 +290,7 @@ module.exports = class TMScraper {
                 blue_1: await this._getTeamData(match.blue_1)
             }
         }
-        else if (this.program = "VIQC"){
+        else if (this.program == "VIQC"){
             return await {
                 match_num: match_num,
                 program: "VIQC",
@@ -311,4 +313,13 @@ module.exports = class TMScraper {
         let team = this.teams.find(t => t.number == team_num);
         return team;
     }
+}
+
+/**
+ * Strip whitespace from a string.
+ * @param {string} str - the string to strip
+ * @returns {string} the stripped string
+ */
+function strip(str){
+    return str.replace(/\s+/g, '');
 }

@@ -3,10 +3,81 @@
     <head>
         <title>Intro Screen</title>
         <link rel="stylesheet" href="/lib/bootstrap.min.css">
+        <link rel="stylesheet" href="index.css">
         <script src="/lib/socket.io.js"></script>
         <script src="index.js"></script>
     </head>
     <body>
-        <h1 class="m-3">Hello!</h1>
+        <!-- intro display for VRC -->
+        <div id="vrc-intro" class="intro-container" style="display:none;">
+            <div class="intro mx-auto">
+                <div class="alliance red left">
+                    <div id="vrc-red1">
+                        <strong>1234A</strong> The Team Name
+                        <br/>
+                        <small>The Place</small>
+                    </div>
+                    <hr class="team-separator">
+                    <div id="vrc-red2">
+                        <strong>1234A</strong> The Team Name
+                        <br/>
+                        <small>The Place</small>
+                    </div>
+                </div>
+                <div class="alliance blue right">
+                    <div id="vrc-blue1">
+                        <strong>1234A</strong> The Team Name
+                        <br/>
+                        <small>The Place</small>
+                    </div>
+                    <hr class="team-separator">
+                    <div id="vrc-blue2">
+                        <strong>1234A</strong> The Team Name
+                        <br/>
+                        <small>The Place</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- intro display for VEXU -->
+        <div class="intro-container" id="vexu-intro" style="display:none">
+            <div class="intro mx-auto">
+                <div class="alliance red left">
+                    <div id="vexu-red">
+                        <strong>1234A</strong> The Team Name
+                        <br/>
+                        <small>The Place</small>
+                    </div>
+                </div>
+                <div class="alliance blue right">
+                    <div id="vexu-blue">
+                        <strong>1234A</strong> The Team Name
+                        <br/>
+                        <small>The Place</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- intro display for VIQC -->
+        <div class="intro-container" id="viqc-intro">
+            <div class="intro mx-auto">
+                <div class="alliance blue left">
+                    <div id="viqc-team1">
+                        <strong>1234A</strong> The Team Name
+                        <br/>
+                        <small>The Place</small>
+                    </div>
+                </div>
+                <div class="alliance blue right">
+                    <div id="viqc-team2">
+                        <strong>1234A</strong> The Team Name
+                        <br/>
+                        <small>The Place</small>
+                    </div>
+                </div>
+            </div>
+        </div>
     </body>
 </html>
