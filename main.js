@@ -1,6 +1,6 @@
 const { exit } = require('process');
 const TMScraper = require('./tm_scraper.js');
-
+const server = require('./server.js');
 
 // set up command-line args
 const yargs = require('yargs');
@@ -46,9 +46,16 @@ function main(){
         exit();
     }
 
+    // create the TM scraper
     let tm_scraper = new TMScraper(args.address, args.password, args['division-name']);
 
-    tm_scraper.onMatchQueue(console.log);
+    // when a new match is queued, send the info to all connected clients
+    tm_scraper.onMatchQueue(m => {
+        server.emit("match_queued", m);
+    });
+
+    // start the web server
+    server.startServer(args.port);
 }
 
 main();
