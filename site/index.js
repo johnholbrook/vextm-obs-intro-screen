@@ -5,6 +5,11 @@ socket.on("match_queued", data => {
     showIntro(data);
 })
 
+socket.on("match_started", () => {
+    // console.log("Match started");
+    setProgram("none");
+});
+
 /**
  * Generate the HTML source for a particular team
  * @param {Object} team The team to generate the HTML for
@@ -58,7 +63,7 @@ function showIntro(match) {
 
 /**
  * Show the correct intro object for the specified program
- * @param {String} program The program to show the intro for
+ * @param {String} program The program to show the intro for, or "none" to hide all
  */
 function setProgram(program) {
     let vrc_intro = document.querySelector("#vrc-intro");
@@ -79,6 +84,12 @@ function setProgram(program) {
             vrc_intro.style.display = "none";
             vexu_intro.style.display = "none";
             viqc_intro.style.display = "";
+            break;
+        case "none":
+        default:
+            vrc_intro.style.display = "none";
+            vexu_intro.style.display = "none";
+            viqc_intro.style.display = "none";
             break;
     }
 }

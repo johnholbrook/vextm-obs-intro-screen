@@ -62,8 +62,12 @@ function main(){
         else{
             // don't get the prediction, just send the info
             server.emit("match_queued", m);
-        }
-        
+        }   
+    });
+
+    // when a match is started, send the info to all connected clients
+    tm_scraper.onMatchStarted(() => {
+        server.emit("match_started");
     });
 
     // start the web server

@@ -34,7 +34,8 @@ module.exports = class TMScraper {
         this.matches = []; // list of matches
 
         this.socket = null; // websocket connection to the TM server
-        this.onMatchQueueCallback = null; // callback for when a match is queued
+        this.onMatchQueueCallback = () => {}; // callback for when a match is queued
+        this.onMatchStartedCallback = () => {}; // callback for when a match is started
     }
 
     /**
@@ -212,10 +213,11 @@ module.exports = class TMScraper {
             await this._authenticate();
         }
 
-        // if the websocket is already open, close it
+        // if the websocket is already open, do nothing
         if (this.websocket){
-            this.websocket.close();
-            this.websocket = null;
+            return;
+            // this.websocket.close();
+            // this.websocket = null;
         }
 
         this.websocket = new WebSocket(`ws://${this.addr}/fieldsets/1`, {
@@ -232,8 +234,8 @@ module.exports = class TMScraper {
         });
         this.websocket.on('message', async event => {
             let data = JSON.parse(event.toString());
-            await this._handleEvent(data);
             // console.log(data);
+            await this._handleEvent(data);
         });
     }
 
@@ -245,15 +247,27 @@ module.exports = class TMScraper {
             let match_info = await this.getMatchTeams(event.name);
             this.onMatchQueueCallback(match_info);
         }
-        // there are various other event types too, but for now we only care about fieldMatchAssigned
+        else if (event.type == "matchStarted"){
+            this.onMatchStartedCallback();
+        }
+        // there are various other event types too, but for now we don't care about them
     }
 
     /**
      * Sets the callback to be executed when a match is queued.
-     * 
+     * @param {function} callback - the callback to be executed
      */
     async onMatchQueue(callback){
         this.onMatchQueueCallback = callback;
+        await this._connectWebsocket();
+    }
+
+    /**
+     * Sets the callback to be executed when a match is started. 
+     * @param {function} callback - the callback to be executed
+     */
+    async onMatchStarted(callback){
+        this.onMatchStartedCallback = callback;
         await this._connectWebsocket();
     }
 
