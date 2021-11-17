@@ -13,7 +13,7 @@ hr.team-separator{
 }
 
 .intro{
-    width: 80%;
+    width: 70%;
     font-size: xx-large;
     display: flex;
     flex-direction: row;
@@ -47,8 +47,9 @@ hr.team-separator{
 }
 
 .match-prediction{
-    width: 80%;
+    width: 70%;
     text-align: center;
+    font-size: x-large;
 }
 
 .match-prediction-bars-area{
