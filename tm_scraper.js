@@ -244,8 +244,12 @@ module.exports = class TMScraper {
      */
     async _handleEvent(event){
         if (event.type == "fieldMatchAssigned"){
-            let match_info = await this.getMatchTeams(event.name);
-            this.onMatchQueueCallback(match_info);
+            if (event.name != "Unknown" && event.name != "P0"){
+                // a match name "unknown" means there is no match queued
+                // also ignore "P0" which is the practice match with no teams
+                let match_info = await this.getMatchTeams(event.name);
+                this.onMatchQueueCallback(match_info);
+            }
         }
         else if (event.type == "matchStarted"){
             this.onMatchStartedCallback();
