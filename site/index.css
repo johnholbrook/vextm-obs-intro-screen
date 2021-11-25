@@ -70,11 +70,12 @@ hr.team-separator{
     font-weight: bold;
 }
 #match-prediction-title{
-    /* background-color: white; */
     background-color: rgb(157,157,157);
     color: white;
-    /* width: auto; */
+
     display: inline-block;
-    padding: 0 0.5em;
+    
+    line-height: 1em;
+    padding: 0.25em 0.5em;
     border-radius: 0.25em 0.25em 0 0;
 }
