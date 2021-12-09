@@ -244,7 +244,7 @@ module.exports = class TMScraper {
      */
     async _handleEvent(event){
         if (event.type == "fieldMatchAssigned"){
-            console.log(`Match Queued: ${event.name}`)
+            // console.log(`Match Queued: ${event.name}`)
             let ingore = ["Unknown", "P0", "D Skills", "P Skills"]
             if (!ingore.includes(event.name)){
                 // a match name "unknown" means there is no match queued

@@ -72,6 +72,8 @@ function main(){
 
     // start the web server
     server.startServer(args.port);
+
+    // console.log(`Display script CWD: ${process.cwd()}`);
 }
 
 main();

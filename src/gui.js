@@ -89,8 +89,8 @@ predictMatchCheckbox.setText("Show match prediction (VRC only)");
 // const serverOutput = new QPlainTextEdit();
 const serverOutput = new QTextEdit();
 serverOutput.setObjectName("serverOutput");
-serverOutput.setVerticalScrollBarPolicy(1);
-serverOutput.setReadOnly(true);
+// serverOutput.setVerticalScrollBarPolicy(1);
+// serverOutput.setReadOnly(true);
 serverOutput.setWordWrapMode(3);
 
 // Button to start the server
@@ -113,7 +113,6 @@ rootViewLayout.addWidget(startButton);
 startButton.addEventListener('clicked', () => {
     if (display_process){
         stopProcess();
-        startButton.setText("Start");
     }
     else{
         clearOutput();
@@ -140,16 +139,36 @@ function startProcess(){
     });
     display_process.on("exit", () => {
         print("Server stopped.");
+        enableInputs();
+        startButton.setText("Start");
         display_process = null;
     });
+    disableInputs();
 }
 
 function stopProcess(){
     print("Stopping server...\n");
     if (display_process){
         display_process.kill();
-        // display_process = null;
     }
+}
+
+// grey out all the input areas so they can't be modified while the display is running
+function disableInputs(){
+    serverAddrInput.setDisabled(true);
+    passInput.setDisabled(true);
+    portInput.setDisabled(true);
+    divisionInput.setDisabled(true);
+    predictMatchCheckbox.setDisabled(true);
+}
+
+// re-enable all the inputs
+function enableInputs(){
+    serverAddrInput.setDisabled(false);
+    passInput.setDisabled(false);
+    portInput.setDisabled(false);
+    divisionInput.setDisabled(false);
+    predictMatchCheckbox.setDisabled(false);
 }
 
 var serverOutputContent = "";
@@ -157,6 +176,7 @@ var serverOutputContent = "";
 function print(text){
     serverOutputContent += text;
     serverOutput.setPlainText(serverOutputContent);
+    // serverOutput.scrollToAnchor();
     serverOutput.ensureCursorVisible();
 }
 
