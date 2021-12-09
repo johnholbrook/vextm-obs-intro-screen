@@ -1,10 +1,10 @@
-const { QMainWindow, QWidget, FlexLayout, QLabel, QLineEdit, QCheckBox, QPlainTextEdit, QPushButton } = require("@nodegui/nodegui");
-const server = require("./display/server");
+const { QMainWindow, QWidget, FlexLayout, QLabel, QLineEdit, QCheckBox, QPlainTextEdit, QTextEdit, QPushButton } = require("@nodegui/nodegui");
+const { spawn } = require("child_process");
 
 // create the window
 const win = new QMainWindow();
 win.setWindowTitle("VEX TM Intro Screen");
-win.resize(300, 400);
+win.resize(500, 400);
 
 // root view
 const rootView = new QWidget();
@@ -86,8 +86,10 @@ const predictMatchCheckbox = new QCheckBox();
 predictMatchCheckbox.setText("Show match prediction (VRC only)");
 
 // area to show the output of the server
-const serverOutput = new QPlainTextEdit();
+// const serverOutput = new QPlainTextEdit();
+const serverOutput = new QTextEdit();
 serverOutput.setObjectName("serverOutput");
+serverOutput.setVerticalScrollBarPolicy(1);
 serverOutput.setReadOnly(true);
 serverOutput.setWordWrapMode(3);
 
@@ -109,14 +111,61 @@ rootViewLayout.addWidget(startButton);
 
 // event handling
 startButton.addEventListener('clicked', () => {
+    if (display_process){
+        stopProcess();
+        startButton.setText("Start");
+    }
+    else{
+        clearOutput();
+        startProcess();
+        startButton.setText("Stop");
+    }
+});
+
+var display_process = null;
+// start the display process
+function startProcess(){
     const address = serverAddrInput.text();
     const password = passInput.text();
     const port = portInput.text();
     const division = divisionInput.text();
     const predict = predictMatchCheckbox.isChecked();
 
-    serverOutput.setPlainText(`Addr: ${address}\nPass: ${password}\nPort: ${port}\nDiv : ${division}\nPredict: ${predict}`);
-});
+    display_process = spawn("./src/display/display.exe", ["-a", address, "-p", password, "--port", port, "-d", division, ...(predict ? ["-G"] : [])]);
+    display_process.stdout.on("data", b => {
+        print(b.toString());
+    });
+    display_process.stderr.on("data", b => {
+        print(b.toString())
+    });
+    display_process.on("exit", () => {
+        print("Server stopped.");
+        display_process = null;
+    });
+}
+
+function stopProcess(){
+    print("Stopping server...\n");
+    if (display_process){
+        display_process.kill();
+        // display_process = null;
+    }
+}
+
+var serverOutputContent = "";
+// print some text to the output area
+function print(text){
+    serverOutputContent += text;
+    serverOutput.setPlainText(serverOutputContent);
+    serverOutput.ensureCursorVisible();
+}
+
+// clear the output area
+function clearOutput(){
+    serverOutputContent = "";
+    serverOutput.setPlainText("");
+    serverOutput.ensureCursorVisible();
+}
 
 // styling
 const rootStyleSheet = `
@@ -134,7 +183,7 @@ const rootStyleSheet = `
 
     #serverAddrRow, #passRow, #portRow, #divisionRow{
         flex-direction: row;
-        margin: 0.25em;
+        margin: 5px;
     }
 
     #serverAddrLabel, #passLabel, #portLabel, #divisionLabel{
@@ -142,7 +191,8 @@ const rootStyleSheet = `
     }
 
     #serverOutput{
-        height: 100px;
+        height: 125px;
+        font: 10pt Courier;
         width: '95%';
         margin-bottom: 4px;
     }

@@ -26,8 +26,8 @@ function getMimeType(filepath) {
 
 // special cases for libraries that are installed via npm
 var includePaths = {
-    "/lib/socket.io.js" : path.join("node_modules", "socket.io", "client-dist", "socket.io.min.js"),
-    "/lib/bootstrap.min.css" : path.join("node_modules", "bootstrap", "dist", "css", "bootstrap.min.css"),
+    "/lib/socket.io.js" : path.join("..", "..", "node_modules", "socket.io", "client-dist", "socket.io.min.js"),
+    "/lib/bootstrap.min.css" : path.join("..", "..", "node_modules", "bootstrap", "dist", "css", "bootstrap.min.css"),
 }
 
 // create the HTTP server

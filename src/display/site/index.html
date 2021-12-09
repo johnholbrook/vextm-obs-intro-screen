@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Intro Screen</title>
+        <link rel="stylesheet" href="/lib/bootstrap.min.css">
+        <link rel="stylesheet" href="index.css">
+        <script src="/lib/socket.io.js"></script>
+        <script src="index.js"></script>
+    </head>
+    <body>
+        <!-- intro display for VRC -->
+        <div id="vrc-intro" class="intro-container">
+            <div class="match-prediction mx-auto" id="match-prediction">
+                <div id="match-prediction-title">
+                    <strong>Match Prediction</strong> 
+                    <br>
+                    <small>powered by vrc-data-analysis.com</small>
+                </div>
+                <div class="match-prediction-bars-area">
+                    <div id="match-prediction-bar-red" class="red"></div>
+                    <div id="match-prediction-bar-blue" class="blue"></div>
+                </div>
+            </div>
+            <div class="m-3"></div>
+            <div class="intro mx-auto">
+                <div class="alliance red left">
+                    <div id="vrc-red1">
+                        <strong>1234A</strong> The Team Name
+                        <br/>
+                        <small>The Place</small>
+                    </div>
+                    <hr class="team-separator">
+                    <div id="vrc-red2">
+                        <strong>1234A</strong> The Team Name
+                        <br/>
+                        <small>The Place</small>
+                    </div>
+                </div>
+                <div class="alliance blue right">
+                    <div id="vrc-blue1">
+                        <strong>1234A</strong> The Team Name
+                        <br/>
+                        <small>The Place</small>
+                    </div>
+                    <hr class="team-separator">
+                    <div id="vrc-blue2">
+                        <strong>1234A</strong> The Team Name
+                        <br/>
+                        <small>The Place</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- intro display for VEXU -->
+        <div class="intro-container" id="vexu-intro" style="display:none">
+            <div class="intro mx-auto">
+                <div class="alliance red left">
+                    <div id="vexu-red">
+                        <strong>1234A</strong> The Team Name
+                        <br/>
+                        <small>The Place</small>
+                    </div>
+                </div>
+                <div class="alliance blue right">
+                    <div id="vexu-blue">
+                        <strong>1234A</strong> The Team Name
+                        <br/>
+                        <small>The Place</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- intro display for VIQC -->
+        <div class="intro-container" id="viqc-intro" style="display:none;">
+            <div class="intro mx-auto">
+                <div class="alliance blue left">
+                    <div id="viqc-team1">
+                        <strong>1234A</strong> The Team Name
+                        <br/>
+                        <small>The Place</small>
+                    </div>
+                </div>
+                <div class="alliance blue right">
+                    <div id="viqc-team2">
+                        <strong>1234A</strong> The Team Name
+                        <br/>
+                        <small>The Place</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
