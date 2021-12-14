@@ -1,38 +1,60 @@
-# vextm-obs-intro-screen
-Alternate "Match Intro" screen for VEX Tournament Manager. Shows information which isn't included in TM's overlay intro screen, such as team names and locations.
+# nodegui-starter
 
-For VRC events, can optionally show predictecd match outcomes from http://vrc-data-analysis.com.
- 
- ## Installation
- Install Node/NPM if you don't have it already, then:
- ```
- git clone https://github.com/johnholbrook/vextm-obs-intro-screen
- cd vextm-obs-intro-screen
- npm install
- ```
- 
- ## Usage
- ```
- node main.js -a TMServerAddress -p TMAdminPassword
- ```
- 
- Other options (see these with the `-h` flag):
- ```
- Options:
-  -h, --help                         Display this help message and exit[boolean]
-      --version                      Show version number               [boolean]
-  -a, --address                      VEX TM Server Address
-                                                 [string] [default: "localhost"]
-  -p, --password                     VEX TM Admin Password              [string]
-  -g, --show-predictions, --predict  Show match predictions (VRC only) [boolean]
-  -P, --port                         Port to serve display on
-                                                        [number] [default: 8080]
-  -d, --division-name                Division name (as used in TM web interface
-                                     URLs – only set this option at
-                                     multi-division events)
-                                                 [string] [default: "division1"]
+**Clone and run for a quick way to see NodeGui in action.**
+
+## To Use
+
+To clone and run this repository you'll need [Git](https://git-scm.com) and [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) installed on your computer.
+
+Make sure you have met the requirements listed here: https://docs.nodegui.org/docs/guides/getting-started#developer-environment
+
+From your command line:
+
+```bash
+# Clone this repository
+git clone https://github.com/nodegui/nodegui-starter
+# Go into the repository
+cd nodegui-starter
+# Install dependencies
+npm install
+# Run the app
+npm start
 ```
 
-The display will then be available as a web page on `http://localhost:8080` (or whatever port is specified with the `--port` flag).
-The display is intended to be shown as a browser source in OBS, over top of the normal "match timer" overlay – 
-it will disappear when a match is started and reappear when the next match is queued.
+## Resources for Learning NodeGui
+
+- [docs.nodegui.org](https://nodegui.github.io/nodegui) - all of NodeGui and React Desktop's documentation
+
+## Packaging app as a distributable
+
+In order to distribute your finished app, you can use [@nodegui/packer](https://github.com/nodegui/packer)
+
+### Step 1: (_**Run this command only once**_)
+
+```sh
+npx nodegui-packer --init MyAppName
+```
+
+This will produce the deploy directory containing the template. You can modify this to suite your needs. Like add icons, change the name, description and add other native features or dependencies. Make sure you commit this directory.
+
+### Step 2: (_**Run this command every time you want to build a new distributable**_)
+
+Next you can run the pack command:
+
+```sh
+npm run build
+```
+
+This will produce the js bundle along with assets inside the `./dist` directory
+
+```sh
+npx nodegui-packer --pack ./dist
+```
+
+This will build the distributable using @nodegui/packer based on your template. The output of the command is found under the build directory. You should gitignore the build directory.
+
+More details about packer can be found here: https://github.com/nodegui/packer
+
+## License
+
+MIT
