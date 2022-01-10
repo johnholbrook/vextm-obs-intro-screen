@@ -3,3 +3,4 @@ dist/
 deploy/win32/build/
 *.log
 .vscode
+.DS_Store

@@ -2,6 +2,37 @@
     background-color: #0f0;
 } */
 
+@font-face{
+    font-family: "NotoSans-Regular";
+    src: url("fonts/NotoSans-Regular.ttf");
+}
+
+@font-face{
+    font-family: "NotoSans-Bold";
+    src: url("fonts/NotoSans-Bold.ttf");
+}
+
+@font-face{
+    font-family: "NotoSans-Italic";
+    src: url("fonts/NotoSans-CondensedItalic.ttf");
+}
+
+strong{
+    font-family: "NotoSans-Bold";
+}
+
+em{
+    font-family: "NotoSans-Italic";
+}
+
+:not(strong):not(em){
+    font-family: "NotoSans-Regular";
+}
+
+small{
+    font-size: 0.5em;
+}
+
 hr.team-separator{
     margin: 0.25em;
 }
