@@ -21,10 +21,11 @@ module.exports = class TMScraper {
      * @param {*} pw TM admin password
      * @param {*} div name of the division (as used in the web interface URLs, e.g. "division1")
      */
-    constructor(addr, pw, div){
+    constructor(addr, pw, div, fs){
         this.addr = addr; // TM server address
         this.pw = pw; // TM admin password
         this.division = div; // name of the division (as used in the web interface URLs, e.g. "division1")
+        this.fs = fs; // ID of the field set to connect to (starts at 1 and counts up from there)
         
         this.program = null; // the program (e.g. "VRC", "VEXU", "VIQC")
         this.cookie = null; // the session cookie
@@ -220,7 +221,7 @@ module.exports = class TMScraper {
             // this.websocket = null;
         }
 
-        this.websocket = new WebSocket(`ws://${this.addr}/fieldsets/1`, {
+        this.websocket = new WebSocket(`ws://${this.addr}/fieldsets/${this.fs}`, {
             headers: {
                 Cookie: this.cookie
             }

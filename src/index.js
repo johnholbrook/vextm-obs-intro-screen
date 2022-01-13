@@ -1,10 +1,10 @@
-const { QMainWindow, QIcon, QWidget, FlexLayout, QLabel, QLineEdit, QCheckBox, QPlainTextEdit, QPushButton } = require("@nodegui/nodegui");
+const { QMainWindow, QIcon, QWidget, FlexLayout, QLabel, QLineEdit, QCheckBox, QPlainTextEdit, QPushButton, QSpinBox } = require("@nodegui/nodegui");
 const { spawn } = require("child_process");
 
 // create the window
 const win = new QMainWindow();
 win.setWindowTitle("VEX TM Intro Screen");
-win.resize(350, 350);
+win.resize(350, 400);
 
 // set the window icon
 const icon = new QIcon("./icon/icon.ico");
@@ -85,6 +85,22 @@ divisionInput.setObjectName("divisionInput");
 divisionInput.setText("division1");
 divisionRowLayout.addWidget(divisionInput);
 
+// field set ID row
+const fieldSetRow = new QWidget();
+const fieldSetRowLayout = new FlexLayout();
+fieldSetRow.setObjectName("fieldSetRow");
+fieldSetRow.setLayout(fieldSetRowLayout);
+
+const fieldSetLabel = new QLabel();
+fieldSetLabel.setText("Field Set ID:");
+fieldSetLabel.setObjectName("fieldSetLabel");
+fieldSetRowLayout.addWidget(fieldSetLabel);
+
+const fieldSetInput = new QSpinBox();
+fieldSetInput.setObjectName("fieldSetInput");
+fieldSetInput.setValue(1);
+fieldSetRowLayout.addWidget(fieldSetInput);
+
 // checkbox to show match predictions
 const predictMatchCheckbox = new QCheckBox();
 predictMatchCheckbox.setText("Show match prediction (VRC only)");
@@ -107,7 +123,8 @@ optionsAreaLayout.addWidget(serverAddrRow);
 optionsAreaLayout.addWidget(passRow);
 optionsAreaLayout.addWidget(portRow);
 optionsAreaLayout.addWidget(divisionRow);
-optionsAreaLayout.addWidget(predictMatchCheckbox)
+optionsAreaLayout.addWidget(fieldSetRow);
+optionsAreaLayout.addWidget(predictMatchCheckbox);
 
 rootViewLayout.addWidget(optionsArea);
 rootViewLayout.addWidget(serverOutput);
@@ -132,9 +149,10 @@ function startProcess(){
     const password = passInput.text();
     const port = portInput.text();
     const division = divisionInput.text();
+    const fieldSet = fieldSetInput.text();
     const predict = predictMatchCheckbox.isChecked();
 
-    display_process = spawn("./display.exe", ["-a", address, "-p", password, "--port", port, "-d", division, ...(predict ? ["-g"] : [])]);
+    display_process = spawn("./display.exe", ["-a", address, "-p", password, "--port", port, "-d", division, "-f", fieldSet, ...(predict ? ["-g"] : [])]);
     display_process.stdout.on("data", b => {
         print(b.toString());
     });
@@ -163,6 +181,7 @@ function disableInputs(){
     passInput.setEnabled(false);
     portInput.setEnabled(false);
     divisionInput.setEnabled(false);
+    fieldSetInput.setEnabled(false);
     predictMatchCheckbox.setEnabled(false);
 }
 
@@ -172,6 +191,7 @@ function enableInputs(){
     passInput.setEnabled(true);
     portInput.setEnabled(true);
     divisionInput.setEnabled(true);
+    fieldSetInput.setEnabled(true);
     predictMatchCheckbox.setEnabled(true);
 }
 
@@ -205,12 +225,12 @@ const rootStyleSheet = `
         margin-bottom: 4px;
     }
 
-    #serverAddrRow, #passRow, #portRow, #divisionRow{
+    #serverAddrRow, #passRow, #portRow, #divisionRow, #fieldSetRow{
         flex-direction: row;
         margin: 5px;
     }
 
-    #serverAddrLabel, #passLabel, #portLabel, #divisionLabel{
+    #serverAddrLabel, #passLabel, #portLabel, #divisionLabel, #fieldSetLabel{
         margin-right: 0.5em;
     }
 

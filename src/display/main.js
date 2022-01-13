@@ -34,6 +34,12 @@ const args = yargs.command("match-intro", "Serve a match intro screen")
                     type: "string",
                     default: "division1"
                   })
+                  .option("field-set", {
+                    alias: "f",
+                    description: "ID of the field set to connect to (only set if you have multiple field sets)",
+                    type: "number",
+                    default: 1
+                  })
                   .option('help', {
                     alias: 'h',
                     description: "Display this help message and exit",
@@ -48,7 +54,7 @@ function main(){
     }
 
     // create the TM scraper
-    let tm_scraper = new TMScraper(args.address, args.password, args['division-name']);
+    let tm_scraper = new TMScraper(args.address, args.password, args['division-name'], args['field-set']);
 
     // when a new match is queued, send the info to all connected clients
     tm_scraper.onMatchQueue(m => {
