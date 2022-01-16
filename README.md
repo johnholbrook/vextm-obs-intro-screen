@@ -1,8 +1,10 @@
 # vextm-obs-intro-screen
 Alternate "Match Intro" screen for VEX Tournament Manager. Shows information which isn't included in TM's overlay intro screen, such as team names and locations.
 
-For VRC events, can optionally show predictecd match outcomes from http://vrc-data-analysis.com.
+For VRC events, can optionally show predicted match outcomes from [vrc-data-analysis.com](http://vrc-data-analysis.com).
  
+<img width="1552" alt="tm-intro" src="https://user-images.githubusercontent.com/3682581/149677509-94ae63c1-1c66-4801-b640-13b86c085a8f.png">
+
  ## Installation
  Download the latest version from the [releases page](https://github.com/johnholbrook/vextm-obs-intro-screen/releases) and unzip it somewhere. Run `VEX TM Intro Screen.exe`.
  
