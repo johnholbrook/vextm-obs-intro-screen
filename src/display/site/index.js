@@ -21,6 +21,17 @@ function generateTeamHTML(team) {
 }
 
 /**
+ * Populate the display with the info for a single VRC team
+ * @param {*} teamid - "red1", "red2", "blue1", or "blue2"
+ * @param {*} info - object with team info
+ */
+function showVRCTeamInfo(teamid, info){
+    document.querySelector(`#vrc-${teamid} .team-num`).innerHTML = info.number;
+    document.querySelector(`#vrc-${teamid} .team-name`).innerHTML = info.name;
+    document.querySelector(`#vrc-${teamid} .team-loc`).innerHTML = info.location;
+}
+
+/**
  * Show the intro for a particular match
  * @param {Object} match The match to show the intro for
  */
@@ -29,10 +40,10 @@ function showIntro(match) {
     
     // set the team info
     if (match.program == "VRC"){
-        document.querySelector("#vrc-red1").innerHTML = generateTeamHTML(match.red_1);
-        document.querySelector("#vrc-red2").innerHTML = generateTeamHTML(match.red_2);
-        document.querySelector("#vrc-blue1").innerHTML = generateTeamHTML(match.blue_1);
-        document.querySelector("#vrc-blue2").innerHTML = generateTeamHTML(match.blue_2);
+        showVRCTeamInfo("red1", match.red_1);
+        showVRCTeamInfo("red2", match.red_2);
+        showVRCTeamInfo("blue1", match.blue_1);
+        showVRCTeamInfo("blue2", match.blue_2);
     }
     else if (match.program == "VEXU"){
         document.querySelector("#vexu-red").innerHTML = generateTeamHTML(match.red_1);
