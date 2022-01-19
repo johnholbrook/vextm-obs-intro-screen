@@ -20,12 +20,15 @@ module.exports = class TMScraper {
      * @param {*} addr the address of the TM server
      * @param {*} pw TM admin password
      * @param {*} div name of the division (as used in the web interface URLs, e.g. "division1")
+     * @param {*} fs ID of the field set to connect to
+     * @param {boolean} omit Omit country from team name if there is also a state/province
      */
-    constructor(addr, pw, div, fs){
+    constructor(addr, pw, div, fs, omit){
         this.addr = addr; // TM server address
         this.pw = pw; // TM admin password
         this.division = div; // name of the division (as used in the web interface URLs, e.g. "division1")
         this.fs = fs; // ID of the field set to connect to (starts at 1 and counts up from there)
+        this.omit = omit ? true:false;
         
         this.program = null; // the program (e.g. "VRC", "VEXU", "VIQC")
         this.cookie = null; // the session cookie
@@ -96,10 +99,29 @@ module.exports = class TMScraper {
         let team_list = [];
         page.querySelectorAll('table.table-striped > tbody > tr').forEach(row => {
             let cols = row.querySelectorAll('td');
+
+            let location = null;
+            if (this.omit){
+                let raw_loc = cols[2].textContent;
+                if (raw_loc.split(",").length > 2){
+                    // there is a state/province, strip the highest-level location (country name)
+                    location = raw_loc.split(",");
+                    location.pop();
+                    location = location.toString();
+                }
+                else{
+                    // there is no state/province, don't modity the location
+                    location = raw_loc;
+                }
+            }
+            else{
+                location = cols[2].textContent;
+            }
+
             team_list.push({
                 number: cols[0].textContent,
                 name: cols[1].textContent,
-                location: cols[2].textContent,
+                location: location,
                 organization: cols[3].textContent
             });
         });

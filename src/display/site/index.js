@@ -26,9 +26,38 @@ function generateTeamHTML(team) {
  * @param {*} info - object with team info
  */
 function showVRCTeamInfo(teamid, info){
+    // show the team number/name/location
     document.querySelector(`#vrc-${teamid} .team-num`).innerHTML = info.number;
     document.querySelector(`#vrc-${teamid} .team-name`).innerHTML = info.name;
     document.querySelector(`#vrc-${teamid} .team-loc`).innerHTML = info.location;
+
+    if (info.stats){
+        // if we have team stats, show them
+        document.querySelector(`#vrc-${teamid} .team-stats`).style.display = "";
+        document.querySelectorAll("#vrc-intro .stats-header").forEach(h => h.style.display = "");
+        document.querySelector(`#vrc-${teamid} .team-bio`).style.width = "";
+
+        document.querySelector(`#vrc-${teamid} .team-awp`).innerHTML = info.stats.awp_rate;
+        document.querySelector(`#vrc-${teamid} .team-ap`).innerHTML = info.stats.avg_ap;
+        document.querySelector(`#vrc-${teamid} .team-ccwm`).innerHTML = info.stats.ccwm;
+    }
+    else{
+        // if we don't have team stats, hide that area
+        document.querySelector(`#vrc-${teamid} .team-stats`).style.display = "none";
+        document.querySelectorAll("#vrc-intro .stats-header").forEach(h => h.style.display = "none");
+        document.querySelector(`#vrc-${teamid} .team-bio`).style.width = "100%";
+    }
+}
+
+/**
+ * Populate the display with info for a single VEXU team
+ * @param {*} teamid - "red" or "blue"
+ * @param {*} info - object with team info
+ */
+function showVEXUTeamInfo(teamid, info){
+    document.querySelector(`#vexu-${teamid} .team-num`).innerHTML = info.number;
+    document.querySelector(`#vexu-${teamid} .team-name`).innerHTML = info.name;
+    document.querySelector(`#vexu-${teamid} .team-loc`).innerHTML = info.location;
 }
 
 /**
@@ -46,8 +75,10 @@ function showIntro(match) {
         showVRCTeamInfo("blue2", match.blue_2);
     }
     else if (match.program == "VEXU"){
-        document.querySelector("#vexu-red").innerHTML = generateTeamHTML(match.red_1);
-        document.querySelector("#vexu-blue").innerHTML = generateTeamHTML(match.blue_1);
+        // document.querySelector("#vexu-red").innerHTML = generateTeamHTML(match.red_1);
+        // document.querySelector("#vexu-blue").innerHTML = generateTeamHTML(match.blue_1);
+        showVEXUTeamInfo("red", match.red_1);
+        showVEXUTeamInfo("blue", match.blue_1);
     }
     else if (match.program == "VIQC"){
         document.querySelector("#viqc-team1").innerHTML = generateTeamHTML(match.team_1);

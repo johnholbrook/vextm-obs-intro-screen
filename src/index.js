@@ -4,7 +4,7 @@ const { spawn } = require("child_process");
 // create the window
 const win = new QMainWindow();
 win.setWindowTitle("VEX TM Intro Screen");
-win.resize(350, 400);
+win.resize(400, 480);
 
 // set the window icon
 const icon = new QIcon("./icon/icon.ico");
@@ -105,6 +105,16 @@ fieldSetRowLayout.addWidget(fieldSetInput);
 const predictMatchCheckbox = new QCheckBox();
 predictMatchCheckbox.setText("Show match prediction (VRC only)");
 
+// checkbox to shorten team locations
+const omitCountryCheckbox = new QCheckBox();
+omitCountryCheckbox.setText("Omit country from team location");
+omitCountryCheckbox.setChecked(true);
+
+// checkbox to show scouting data
+const showStatsCheckbox = new QCheckBox();
+showStatsCheckbox.setText("Show team scouting data");
+showStatsCheckbox.setChecked(true);
+
 // area to show the output of the server
 const serverOutput = new QPlainTextEdit();
 // const serverOutput = new QTextEdit();
@@ -125,6 +135,8 @@ optionsAreaLayout.addWidget(portRow);
 optionsAreaLayout.addWidget(divisionRow);
 optionsAreaLayout.addWidget(fieldSetRow);
 optionsAreaLayout.addWidget(predictMatchCheckbox);
+optionsAreaLayout.addWidget(omitCountryCheckbox);
+optionsAreaLayout.addWidget(showStatsCheckbox);
 
 rootViewLayout.addWidget(optionsArea);
 rootViewLayout.addWidget(serverOutput);
@@ -151,8 +163,19 @@ function startProcess(){
     const division = divisionInput.text();
     const fieldSet = fieldSetInput.text();
     const predict = predictMatchCheckbox.isChecked();
+    const omitCountry = omitCountryCheckbox.isChecked();
+    const showStats = showStatsCheckbox.isChecked();
 
-    display_process = spawn("./display.exe", ["-a", address, "-p", password, "--port", port, "-d", division, "-f", fieldSet, ...(predict ? ["-g"] : [])]);
+    display_process = spawn("./display.exe", [
+        "-a", address, 
+        "-p", password,
+        "--port", port,
+        "-d", division,
+        "-f", fieldSet, 
+        ...(predict ? ["-g"] : []),
+        ...(omitCountry ? ["-o"] : []),
+        ...(showStats ? ["-s"] : [])
+    ]);
     display_process.stdout.on("data", b => {
         print(b.toString());
     });
@@ -183,6 +206,8 @@ function disableInputs(){
     divisionInput.setEnabled(false);
     fieldSetInput.setEnabled(false);
     predictMatchCheckbox.setEnabled(false);
+    omitCountryCheckbox.setEnabled(false);
+    showStatsCheckbox.setEnabled(false);
 }
 
 // re-enable all the inputs
@@ -193,6 +218,8 @@ function enableInputs(){
     divisionInput.setEnabled(true);
     fieldSetInput.setEnabled(true);
     predictMatchCheckbox.setEnabled(true);
+    omitCountryCheckbox.setEnabled(true);
+    showStatsCheckbox.setEnabled(true);
 }
 
 var serverOutputContent = "";

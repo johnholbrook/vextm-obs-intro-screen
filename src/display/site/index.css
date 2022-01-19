@@ -29,8 +29,14 @@ em{
     font-family: "NotoSans-Regular";
 }
 
+.team-num{
+    font-size: 1.8rem;
+}
+.team-name{
+    font-size: 1.8rem;
+}
 .team-loc{
-    font-size: 1.75rem;
+    font-size: 1.65rem;
 }
 
 hr.team-separator{
@@ -44,7 +50,7 @@ hr.team-separator{
 }
 
 .intro{
-    width: 70%;
+    width: 73%;
     font-size: 2rem;
     display: flex;
     flex-direction: row;
@@ -84,7 +90,7 @@ hr.team-separator{
 }
 .team-stats{
     width: 30%;
-    font-size: 1.35rem;
+    font-size: 1.5rem;
 }
 .red .team-stats{
     text-align: right;
@@ -93,8 +99,9 @@ hr.team-separator{
     text-align: left;
 }
 
+
 .match-prediction{
-    width: 70%;
+    width: 73%;
     text-align: center;
     font-size: 1.5rem;
 }
