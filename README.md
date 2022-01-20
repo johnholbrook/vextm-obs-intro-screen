@@ -18,7 +18,7 @@ To build just the display server, run `npm run build-display`. To build just the
 To run the GUI app without building it, `npm run start` (but the display server will still need to be built first).
  
  ## Usage
- Enter the TM server address and password, then click "Start". The output of the display serevr will be shown in the box:
+ Enter the TM server address and password, then click "Start". The output of the display server will be shown in the box:
  
  ![image](https://user-images.githubusercontent.com/3682581/146073319-54f830bf-0f85-4f2e-b11d-33aaecccf2e1.png)
 
