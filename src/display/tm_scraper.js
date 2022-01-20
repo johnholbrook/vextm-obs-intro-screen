@@ -179,7 +179,7 @@ module.exports = class TMScraper {
      */
     _extractMatchData(row){
         let cols = row.querySelectorAll('td');
-        if (this.program == "VRC"){
+        if (this.program == "VRC" || this.program == "RADC"){
             return {
                 match_num: strip(cols[0].textContent),
                 red_1: strip(cols[1].textContent),
@@ -205,26 +205,47 @@ module.exports = class TMScraper {
     }
 
     /** 
-     * Determines which program is being run (VRC, VIQC, VEXU, etc.)
+     * Determines which program is being run (VRC, VIQC, VEXU, or RADC)
      */
     async _fetchProgram(){
-        // console.log("Fetching program...");
-        let page_data = await this._makeRequest(`${this.division}/matches`);
-        let page = new jsdom.JSDOM(page_data).window.document;
-        let headers = page.querySelectorAll('table.table-striped > thead > tr > th');
-        if (headers[1].textContent == "Red Teams"){
-            // VRC, VEXU, or RADC
-            let row = page.querySelector('table.table-striped > tbody > tr').querySelectorAll('td');
-            if (row.length == 5){
-                this.program = "VEXU"; // or VAIC
-            }
-            else if (row.length == 7){
-                this.program = "VRC"; // or RADC
-            }
-        }
-        else if (headers[1].textContent == "Team 1"){
+        let matches_page_data = await this._makeRequest(`${this.division}/matches`);
+        let matches_page = new jsdom.JSDOM(matches_page_data).window.document;
+        let matches_row = matches_page.querySelector('table.table-striped > tbody > tr').querySelectorAll('td');
+
+        let rankings_page_data = await this._makeRequest(`${this.division}/rankings`);
+        let rankings_page = new jsdom.JSDOM(rankings_page_data).window.document;
+        let raknings_row = rankings_page.querySelector('table.table-striped > tbody > tr').querySelectorAll('td');
+
+        if (matches_row.length == 4){
             this.program = "VIQC";
         }
+        else if (matches_row.length == 5){
+            this.program = "VEXU";
+        }
+        else if (matches_row.length == 7){
+            if (raknings_row.length == 6){
+                this.program = "RADC";
+            }
+            else{
+                this.program = "VRC";
+            }
+        }
+        // let page_data = await this._makeRequest(`${this.division}/matches`);
+        // let page = new jsdom.JSDOM(page_data).window.document;
+        // let headers = page.querySelectorAll('table.table-striped > thead > tr > th');
+        // if (headers[1].textContent == "Red Teams"){
+        //     // VRC, VEXU, or RADC
+        //     let row = page.querySelector('table.table-striped > tbody > tr').querySelectorAll('td');
+        //     if (row.length == 5){
+        //         this.program = "VEXU"; // or VAIC
+        //     }
+        //     else if (row.length == 7){
+        //         this.program = "VRC"; // or RADC
+        //     }
+        // }
+        // else if (headers[1].textContent == "Team 1"){
+        //     this.program = "VIQC";
+        // }
     }
 
     /**
@@ -330,10 +351,10 @@ module.exports = class TMScraper {
 
         // console.log(match);
 
-        if (this.program == "VRC"){
+        if (this.program == "VRC" || this.program == "RADC"){
             return await {
                 match_num: match_num,
-                program: "VRC",
+                program: this.program,
                 red_1: await this._getTeamData(match.red_1),
                 red_2: await this._getTeamData(match.red_2),
                 blue_1: await this._getTeamData(match.blue_1),

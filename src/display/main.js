@@ -71,6 +71,8 @@ function main(){
 
     // when a new match is queued, send the info to all connected clients
     tm_scraper.onMatchQueue(async (m) => {
+        // console.log(m);
+
         // add team scouting data, if applicable
         if (args['show-stats']){
             m = await stats.AddTeamStats(m);

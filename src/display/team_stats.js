@@ -48,6 +48,53 @@ module.exports = class TeamStats{
     }
 
     /**
+     * @brief Get stats for a RADC team from api.vexstreams.com (frontend to RobotEvents API)
+     * @param {String} team - team number (e.g. 1234A)
+     */
+    static async RADCTeamStats(team){
+        let url = `http://api.vexstreams.com/team/RADC/${team}`;
+
+        try{
+            let response = await this._makeRequest(url);
+            return response;
+        }
+        catch(err){
+            return {
+                "high_score": "N/A",
+                "avg_score": "N/A",
+                "max_skills": "N/A"
+            }
+        }
+    }
+
+    /**
+     * @brief Get stats for a VRC team from api.vexstreams.com (frontend to RobotEvents API)
+     * @param {String} team - team number (e.g. 1234A)
+     */
+    static async VIQCTeamStats(team){
+        let url = `http://api.vexstreams.com/team/VIQC/${team}`;
+
+        try{
+            let response = await this._makeRequest(url);
+            if (!response.error){
+                return response;
+            }
+            else return {
+                "high_score": "N/A",
+                "avg_score": "N/A",
+                "max_d_skills": "N/A"
+            };
+        }
+        catch(err){
+            return {
+                "high_score": "N/A",
+                "avg_score": "N/A",
+                "max_d_skills": "N/A"
+            }
+        }
+    }
+
+    /**
      * Add team stats to a Match object
      * @param {Object} match - Object representing a particular match
      */
@@ -57,6 +104,18 @@ module.exports = class TeamStats{
             match.blue_2.stats = await this.VRCTeamStats(match.blue_2.number);
             match.red_1.stats = await this.VRCTeamStats(match.red_1.number);
             match.red_2.stats = await this.VRCTeamStats(match.red_2.number);
+            return match;
+        }
+        else if (match.program == "RADC"){
+            match.blue_1.stats = await this.RADCTeamStats(match.blue_1.number);
+            match.blue_2.stats = await this.RADCTeamStats(match.blue_2.number);
+            match.red_1.stats = await this.RADCTeamStats(match.red_1.number);
+            match.red_2.stats = await this.RADCTeamStats(match.red_2.number);
+            return match;
+        }
+        else if (match.program == "VIQC"){
+            match.team_1.stats = await this.VIQCTeamStats(match.team_1.number);
+            match.team_2.stats = await this.VIQCTeamStats(match.team_2.number);
             return match;
         }
         else{

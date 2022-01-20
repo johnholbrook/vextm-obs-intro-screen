@@ -63,10 +63,19 @@ hr.team-separator{
 }
 
 .alliance.left{
-    border-top-left-radius: 1em;
+    border-top-left-radius: 1rem;
 }
 .alliance.right{
-    border-top-right-radius: 1em;
+    border-top-right-radius: 1rem;
+}
+
+#viqc-intro .left{
+    border-top-right-radius: 1rem;
+    margin-right: 0.5rem;
+}
+#viqc-intro .right{
+    border-top-left-radius: 1rem;
+    margin-left: 0.5rem;
 }
 
 .right{
@@ -92,10 +101,10 @@ hr.team-separator{
     width: 30%;
     font-size: 1.5rem;
 }
-.red .team-stats{
+.left .team-stats{
     text-align: right;
 }
-.blue .team-stats{
+.right .team-stats{
     text-align: left;
 }
 
