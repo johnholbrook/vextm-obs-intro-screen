@@ -33,9 +33,9 @@ module.exports = class TeamStats{
         try{
             let response = await this._makeRequest(url);
             return {
-                "avg_ap": response.ap_per_match ? response.ap_per_match : "N/A",
-                "awp_rate": response.awp_per_match ? `${response.awp_per_match*100}%` : "N/A",
-                "ccwm": response.ccwm ? response.ccwm : "N/A"
+                "avg_ap": isNumber(response.ap_per_match) ? response.ap_per_match : "N/A",
+                "awp_rate": isNumber(response.awp_per_match) ? `${response.awp_per_match*100}%` : "N/A",
+                "ccwm": isNumber(response.ccwm) ? response.ccwm : "N/A"
             }
         }
         catch(err){
@@ -122,4 +122,8 @@ module.exports = class TeamStats{
             return match;
         }
     }
+}
+
+function isNumber(o){
+    return typeof o === 'number' && isFinite(o);
 }
