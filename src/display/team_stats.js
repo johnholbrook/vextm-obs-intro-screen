@@ -28,21 +28,17 @@ module.exports = class TeamStats{
      * @param {String} team - team number (e.g. 1234A)
      */
     static async VRCTeamStats(team){
-        let url = `http://vrc-data-analysis.com/v1/team/${team}`;
+        let url = `http://api.vexstreams.com/team/VRC/${team}`;
 
         try{
             let response = await this._makeRequest(url);
-            return {
-                "avg_ap": isNumber(response.ap_per_match) ? response.ap_per_match : "N/A",
-                "awp_rate": isNumber(response.awp_per_match) ? `${response.awp_per_match*100}%` : "N/A",
-                "ccwm": isNumber(response.ccwm) ? response.ccwm : "N/A"
-            }
+            return response;
         }
-        catch(err){
+        catch (err){
             return {
                 "avg_ap": "N/A",
                 "awp_rate": "N/A",
-                "ccwm": "N/A"
+                "record": "N/A"
             }
         }
     }

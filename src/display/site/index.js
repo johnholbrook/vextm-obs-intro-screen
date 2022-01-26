@@ -39,7 +39,7 @@ function showVRCTeamInfo(teamid, info){
 
         document.querySelector(`#vrc-${teamid} .team-awp`).innerHTML = info.stats.awp_rate;
         document.querySelector(`#vrc-${teamid} .team-ap`).innerHTML = info.stats.avg_ap;
-        document.querySelector(`#vrc-${teamid} .team-ccwm`).innerHTML = info.stats.ccwm;
+        document.querySelector(`#vrc-${teamid} .team-wlt`).innerHTML = info.stats.record;
     }
     else{
         // if we don't have team stats, hide that area
