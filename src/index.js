@@ -1,4 +1,4 @@
-const { QMainWindow, QIcon, QWidget, FlexLayout, QLabel, QLineEdit, QCheckBox, QPlainTextEdit, QPushButton, QSpinBox } = require("@nodegui/nodegui");
+const { QMainWindow, QIcon, QWidget, FlexLayout, QLabel, QLineEdit, QCheckBox, QPlainTextEdit, QPushButton, QSpinBox, QCursor, QScrollBar } = require("@nodegui/nodegui");
 const { spawn } = require("child_process");
 
 // create the window
@@ -119,6 +119,9 @@ showStatsCheckbox.setChecked(true);
 const serverOutput = new QPlainTextEdit();
 // const serverOutput = new QTextEdit();
 serverOutput.setObjectName("serverOutput");
+serverOutput.setHorizontalScrollBarPolicy(1);
+const serverOutputScrollBar = new QScrollBar();
+serverOutput.setVerticalScrollBar(serverOutputScrollBar);
 // serverOutput.setVerticalScrollBarPolicy(1);
 serverOutput.setReadOnly(true);
 serverOutput.setWordWrapMode(0);
@@ -222,20 +225,15 @@ function enableInputs(){
     showStatsCheckbox.setEnabled(true);
 }
 
-var serverOutputContent = "";
 // print some text to the output area
 function print(text){
-    serverOutputContent += text;
-    serverOutput.setPlainText(serverOutputContent);
-    // serverOutput.scrollToAnchor();
-    // serverOutput.ensureCursorVisible();
+    serverOutput.insertPlainText(text);
+    serverOutputScrollBar.setSliderPosition(serverOutputScrollBar.maximum()-1);
 }
 
 // clear the output area
 function clearOutput(){
-    serverOutputContent = "";
     serverOutput.setPlainText("");
-    // serverOutput.ensureCursorVisible();
 }
 
 // styling
