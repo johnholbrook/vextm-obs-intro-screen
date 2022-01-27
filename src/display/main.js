@@ -60,7 +60,7 @@ const args = yargs.command("match-intro", "Serve a match intro screen")
                   }).argv;
 
 
-function main(){
+async function main(){
     if (!args.password){
         console.error("Must specify TM admin password");
         exit();
@@ -69,13 +69,20 @@ function main(){
     // create the TM scraper
     let tm_scraper = new TMScraper(args.address, args.password, args['division-name'], args['field-set'], args['omit-country']);
 
+    // start fetching team stats, if applicable
+    let team_stats = null;
+    let program = await tm_scraper.getProgram();
+    if (args['show-stats'] && program != "VEXU"){ // stats for U aren't supported yet
+        let team_numbers = (await tm_scraper.getTeams()).map(t => t.number);
+        team_stats = new stats(program, team_numbers);
+        team_stats.start(480);
+    }
+
     // when a new match is queued, send the info to all connected clients
     tm_scraper.onMatchQueue(async (m) => {
-        // console.log(m);
-
         // add team scouting data, if applicable
-        if (args['show-stats']){
-            m = await stats.AddTeamStats(m);
+        if (args['show-stats'] && tm_scraper.program != "VEXU"){ // stats for U aren't supported yet
+            m = await team_stats.AddTeamStats(m);
         }
 
         // add match prediction, if applicable
@@ -85,19 +92,6 @@ function main(){
 
         // send match info to clients
         server.emit("match_queued", m);
-
-        // if (m.program == "VRC" && args['show-predictions']){
-        //     // get the match prediction before sending info to clients
-        //     m.prediction = await vrc_match_predictor.predict(m);
-        //     // vrc_match_predictor.predict(m).then(prediction => {
-        //     //     m.prediction = prediction;
-        //     //     server.emit("match_queued", m);
-        //     // });
-        // }
-        // else{
-        //     // don't get the prediction, just send the info
-        //     server.emit("match_queued", m);
-        // }   
     });
 
     // when a match is started, send the info to all connected clients

@@ -230,22 +230,18 @@ module.exports = class TMScraper {
                 this.program = "VRC";
             }
         }
-        // let page_data = await this._makeRequest(`${this.division}/matches`);
-        // let page = new jsdom.JSDOM(page_data).window.document;
-        // let headers = page.querySelectorAll('table.table-striped > thead > tr > th');
-        // if (headers[1].textContent == "Red Teams"){
-        //     // VRC, VEXU, or RADC
-        //     let row = page.querySelector('table.table-striped > tbody > tr').querySelectorAll('td');
-        //     if (row.length == 5){
-        //         this.program = "VEXU"; // or VAIC
-        //     }
-        //     else if (row.length == 7){
-        //         this.program = "VRC"; // or RADC
-        //     }
-        // }
-        // else if (headers[1].textContent == "Team 1"){
-        //     this.program = "VIQC";
-        // }
+    }
+
+    /**
+     * Returns the program.
+     * @returns {String} the program
+     */
+     async getProgram(){
+        if (!this.program){
+            await this._fetchProgram();
+        }
+
+        return this.program;
     }
 
     /**
@@ -402,3 +398,4 @@ module.exports = class TMScraper {
 function strip(str){
     return str.replace(/\s+/g, '');
 }
+
