@@ -46,7 +46,8 @@ module.exports = class TeamStats{
 
         let updateFunc = async () => {
             let start_time = new Date();
-            console.log(`Fetching team stats at ${start_time.getHours()}:${start_time.getMinutes()}:${start_time.getSeconds()}...`);
+            let start_time_string = start_time.toLocaleTimeString('en-US', {hour12: false, hour: 'numeric', minute: 'numeric', second: 'numeric'});
+            console.log(`Fetching team stats at ${start_time_string}...`);
             await asyncForEach(this.teams, async t => {
                 let data = await this.fetchStats(t);
                 // console.log(`${t}: ${JSON.stringify(data)}`);
