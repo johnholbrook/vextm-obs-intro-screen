@@ -19,6 +19,9 @@ module.exports = class TeamStats{
             case "VRC":
                 this.fetchStats = this._fetchVRCTeamStats;
                 break;
+            case "VEXU":
+                this.fetchStats = this._fetchVEXUTeamStats;
+                break;
             case "VIQC":
                 this.fetchStats = this._fetchVIQCTeamStats;
                 break;
@@ -123,6 +126,34 @@ module.exports = class TeamStats{
     }
 
     /**
+     * @brief Get stats for a VEXU team from api.vexstreams.com (frontend to RobotEvents API)
+     * @param {String} team - team number (e.g. SQL)
+     */
+     async _fetchVEXUTeamStats(team){
+        let url = `http://api.vexstreams.com/team/VEXU/${team}`;
+        // console.log(url);
+
+        try{
+            let response = await this._makeRequest(url);
+            if (!response.error) return response;
+            else return {
+                "avg_ap": "N/A",
+                "awp_rate": "N/A",
+                "record": "N/A",
+                "error_msg": response.error 
+            }
+        }
+        catch (err){
+            return {
+                "avg_ap": "N/A",
+                "awp_rate": "N/A",
+                "record": "N/A",
+                "error_msg": err.message
+            }
+        }
+    }
+
+    /**
      * @brief Get stats for a RADC team from api.vexstreams.com (frontend to RobotEvents API)
      * @param {String} team - team number (e.g. 1234A)
      */
@@ -191,6 +222,11 @@ module.exports = class TeamStats{
         else if (match.program == "VIQC"){
             match.team_1.stats = await this.get(match.team_1.number);
             match.team_2.stats = await this.get(match.team_2.number);
+            return match;
+        }
+        else if (match.program == "VEXU"){
+            match.blue_1.stats = await this.get(match.blue_1.number);
+            match.red_1.stats = await this.get(match.red_1.number);
             return match;
         }
         else{

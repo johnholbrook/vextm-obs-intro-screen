@@ -72,7 +72,8 @@ async function main(){
     // start fetching team stats, if applicable
     let team_stats = null;
     let program = await tm_scraper.getProgram();
-    if (args['show-stats'] && program != "VEXU"){ // stats for U aren't supported yet
+    // if (args['show-stats'] && program != "VEXU"){ // stats for U aren't supported yet
+    if (args['show-stats']){
         let team_numbers = (await tm_scraper.getTeams()).map(t => t.number);
         team_stats = new stats(program, team_numbers);
         team_stats.start(480);
@@ -81,7 +82,8 @@ async function main(){
     // when a new match is queued, send the info to all connected clients
     tm_scraper.onMatchQueue(async (m) => {
         // add team scouting data, if applicable
-        if (args['show-stats'] && tm_scraper.program != "VEXU"){ // stats for U aren't supported yet
+        // if (args['show-stats'] && tm_scraper.program != "VEXU"){ // stats for U aren't supported yet
+        if (args['show-stats']){
             m = await team_stats.AddTeamStats(m);
         }
 

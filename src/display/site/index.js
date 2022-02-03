@@ -124,8 +124,8 @@ function showVEXUTeamInfo(teamid, info){
         document.querySelectorAll("#vexu-intro .stats-header").forEach(h => h.style.display = "");
         document.querySelector(`#vexu-${teamid} .team-bio`).style.width = "";
 
-        document.querySelector(`#vexu-${teamid} .team-max`).innerHTML = info.stats.high_score;
-        document.querySelector(`#vexu-${teamid} .team-avg`).innerHTML = info.stats.avg_score;
+        document.querySelector(`#vexu-${teamid} .team-awp`).innerHTML = info.stats.awp_rate;
+        document.querySelector(`#vexu-${teamid} .team-ap`).innerHTML = info.stats.avg_ap;
         document.querySelector(`#vexu-${teamid} .team-wlt`).innerHTML = info.stats.record;
     }
     else{
