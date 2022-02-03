@@ -157,16 +157,21 @@ function showIntro(match) {
         showRADCTeamInfo("blue2", match.blue_2);
     }
     else if (match.program == "VEXU"){
-        // document.querySelector("#vexu-red").innerHTML = generateTeamHTML(match.red_1);
-        // document.querySelector("#vexu-blue").innerHTML = generateTeamHTML(match.blue_1);
         showVEXUTeamInfo("red", match.red_1);
         showVEXUTeamInfo("blue", match.blue_1);
     }
     else if (match.program == "VIQC"){
-        // document.querySelector("#viqc-team1").innerHTML = generateTeamHTML(match.team_1);
-        // document.querySelector("#viqc-team2").innerHTML = generateTeamHTML(match.team_2);
         showVIQCTeamInfo("team1", match.team_1);
         showVIQCTeamInfo("team2", match.team_2);
+
+        // if this is match F2 or later...
+        if (match.match_num[0] == "F" && match.match_num[1] != "1"){
+            // change the width of the intro to not obscure the "score to beat"
+            document.querySelector("#viqc-intro").classList.add("iq-finals");
+        }
+        else{
+            document.querySelector("#viqc-intro").classList.remove("iq-finals");
+        }
     }
 
     // show the match prediction, if applicable

@@ -57,6 +57,12 @@ hr.team-separator{
     color: white
 }
 
+.iq-finals{
+    width: 93% !important;
+    position: fixed;
+    left: 1.1rem;
+}
+
 .alliance{
     width: 50%;
     padding: 0.5em 1em;
