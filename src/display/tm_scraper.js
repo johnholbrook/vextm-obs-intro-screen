@@ -40,6 +40,7 @@ module.exports = class TMScraper {
         this.socket = null; // websocket connection to the TM server
         this.onMatchQueueCallback = () => {}; // callback for when a match is queued
         this.onMatchStartedCallback = () => {}; // callback for when a match is started
+        this.onTimeUpdatedCallback = () => {}; // callback for when the match time is updated (i.e., once per second during the match)
     }
 
     /**
@@ -310,6 +311,9 @@ module.exports = class TMScraper {
         else if (event.type == "matchStarted"){
             this.onMatchStartedCallback();
         }
+        else if (event.type == "timeUpdated"){
+            this.onTimeUpdatedCallback(event);
+        }
         // there are various other event types too, but for now we don't care about them
     }
 
@@ -328,6 +332,16 @@ module.exports = class TMScraper {
      */
     async onMatchStarted(callback){
         this.onMatchStartedCallback = callback;
+        await this._connectWebsocket();
+    }
+
+    /**
+     * Sets the callback to be executed when the match time changes
+     * (i.e., once per second while the match is running)
+     * @param {function} callback - the callback to be executed
+     */
+    async onMatchTimeUpdated(callback){
+        this.onTimeUpdatedCallback = callback;
         await this._connectWebsocket();
     }
 

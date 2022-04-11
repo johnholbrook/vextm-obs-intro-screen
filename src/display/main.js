@@ -53,6 +53,11 @@ const args = yargs.command("match-intro", "Serve a match intro screen")
                     type: "boolean",
                     default: false
                   })
+                  .option("sounds", {
+                    description: "Play VRC sound effects through intro overlay",
+                    type: "boolean",
+                    default: false
+                  })
                   .option('help', {
                     alias: 'h',
                     description: "Display this help message and exit",
@@ -98,7 +103,12 @@ async function main(){
 
     // when a match is started, send the info to all connected clients
     tm_scraper.onMatchStarted(() => {
-        server.emit("match_started");
+        server.emit("match_started", args["sounds"]);
+    });
+
+    tm_scraper.onMatchTimeUpdated((e) =>{
+        e.play_sounds = args["sounds"];
+        server.emit("match_time_updated", e);
     });
 
     // start the web server

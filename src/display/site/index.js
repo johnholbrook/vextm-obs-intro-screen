@@ -1,13 +1,28 @@
 const socket = io();
 
+// preload sounds
+var start = new Audio("/sounds/Start.wav");
+var pause = new Audio("/sounds/Pause.wav");
+var warning = new Audio("/sounds/Warning.wav");
+var stop = new Audio("/sounds/Stop.wav");
+
 socket.on("match_queued", data => {
     console.log(data);
     showIntro(data);
 })
 
-socket.on("match_started", () => {
+socket.on("match_started", play_sounds => {
     // console.log("Match started");
     setProgram("none");
+    if (play_sounds) start.play();
+});
+
+socket.on("match_time_updated", data => {
+    if (data.play_sounds){
+        if (data.state == "AUTO" && data.remaining == 0) pause.play();
+        else if (data.state == "DRIVER" && data.remaining == 15) warning.play();
+        else if (data.state == "DRIVER" && data.remaining == 0) stop.play();
+    }
 });
 
 /**
