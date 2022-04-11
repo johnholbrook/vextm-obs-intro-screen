@@ -115,6 +115,10 @@ const showStatsCheckbox = new QCheckBox();
 showStatsCheckbox.setText("Show team scouting data");
 showStatsCheckbox.setChecked(true);
 
+// checkbox to play VRC sound effects
+const playSoundsCheckbox = new QCheckBox();
+playSoundsCheckbox.setText("Play VRC sound effects from display");
+
 // area to show the output of the server
 const serverOutput = new QPlainTextEdit();
 // const serverOutput = new QTextEdit();
@@ -138,6 +142,7 @@ optionsAreaLayout.addWidget(portRow);
 optionsAreaLayout.addWidget(divisionRow);
 optionsAreaLayout.addWidget(fieldSetRow);
 optionsAreaLayout.addWidget(predictMatchCheckbox);
+optionsAreaLayout.addWidget(playSoundsCheckbox);
 optionsAreaLayout.addWidget(omitCountryCheckbox);
 optionsAreaLayout.addWidget(showStatsCheckbox);
 
@@ -168,6 +173,7 @@ function startProcess(){
     const predict = predictMatchCheckbox.isChecked();
     const omitCountry = omitCountryCheckbox.isChecked();
     const showStats = showStatsCheckbox.isChecked();
+    const playSounds = playSoundsCheckbox.isChecked();
 
     display_process = spawn("./display.exe", [
         "-a", address, 
@@ -177,7 +183,8 @@ function startProcess(){
         "-f", fieldSet, 
         ...(predict ? ["-g"] : []),
         ...(omitCountry ? ["-o"] : []),
-        ...(showStats ? ["-s"] : [])
+        ...(showStats ? ["-s"] : []),
+        ...(playSounds ? ["--sounds"] : [])
     ]);
     display_process.stdout.on("data", b => {
         print(b.toString());
@@ -211,6 +218,7 @@ function disableInputs(){
     predictMatchCheckbox.setEnabled(false);
     omitCountryCheckbox.setEnabled(false);
     showStatsCheckbox.setEnabled(false);
+    playSoundsCheckbox.setEnabled(false);
 }
 
 // re-enable all the inputs
@@ -223,6 +231,7 @@ function enableInputs(){
     predictMatchCheckbox.setEnabled(true);
     omitCountryCheckbox.setEnabled(true);
     showStatsCheckbox.setEnabled(true);
+    playSoundsCheckbox.setEnabled(true);
 }
 
 // print some text to the output area
