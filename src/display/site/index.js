@@ -145,10 +145,19 @@ function showIntro(match) {
     
     // set the team info
     if (match.program == "VRC"){
-        showVRCTeamInfo("red1", match.red_1);
-        showVRCTeamInfo("red2", match.red_2);
-        showVRCTeamInfo("blue1", match.blue_1);
-        showVRCTeamInfo("blue2", match.blue_2);
+        if (!match.red_2 && !match.blue_2){
+            // special case for WVSSAC Robotics events where eliminations are 1v1
+            // https://www.wvroboticsalliance.org/programs/wvssac-robotics/rules
+            setProgram("VEXU"); // the VEXU display looks like the VRC display, but with 1 team/alliance
+            showVEXUTeamInfo("red", match.red_1);
+            showVEXUTeamInfo("blue", match.blue_1);
+        }
+        else{
+            showVRCTeamInfo("red1", match.red_1);
+            showVRCTeamInfo("red2", match.red_2);
+            showVRCTeamInfo("blue1", match.blue_1);
+            showVRCTeamInfo("blue2", match.blue_2);
+        }
     }
     else if (match.program == "RADC"){
         showRADCTeamInfo("red1", match.red_1);
