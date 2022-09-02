@@ -263,7 +263,7 @@ module.exports = class TMScraper {
 
             return {
                 rank: cols[0].textContent,
-                team: cols[1].textContent,
+                number: cols[1].textContent,
                 name: cols[2].textContent,
                 wp: cols[3].textContent,
                 ap: cols[4].textContent,
@@ -276,7 +276,7 @@ module.exports = class TMScraper {
         else if (this.program == "VIQC"){
             return {
                 rank: cols[0].textContent,
-                team: cols[1].textContent,
+                number: cols[1].textContent,
                 name: cols[2].textContent,
                 matches: cols[3].textContent,
                 avg_score: cols[4].textContent
@@ -285,7 +285,7 @@ module.exports = class TMScraper {
         else if (this.program == "RADC"){
             return{
                 rank: cols[0].textContent,
-                team: cols[1].textContent,
+                number: cols[1].textContent,
                 name: cols[2].textContent,
                 wp: cols[3].textContent,
                 sp: cols[4].textContent,
@@ -501,8 +501,16 @@ module.exports = class TMScraper {
             await this._fetchTeams();
         }
 
+        // pull new ranking data
+        await this._fetchRankings();
+
         let team = this.teams.find(t => t.number == team_num);
-        return team;
+        let team_rank = this.rankings.find(r => r.number == team_num);
+        // return team;
+        return {
+            ...team,
+            ...team_rank
+        }
     }
 }
 
