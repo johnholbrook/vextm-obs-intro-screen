@@ -36,6 +36,7 @@ module.exports = class TMScraper {
         
         this.teams = []; // list of teams
         this.matches = []; // list of matches
+        this.rankings = []; // list of rankings
 
         this.socket = null; // websocket connection to the TM server
         this.onMatchQueueCallback = () => {}; // callback for when a match is queued
@@ -80,6 +81,7 @@ module.exports = class TMScraper {
 
         // build the url and options
         let url = `http://${this.addr}/${page}`;
+        // console.log(url);
         let options = {
             headers: {
                 Cookie: this.cookie
@@ -161,19 +163,6 @@ module.exports = class TMScraper {
     }
 
     /**
-     * Returns the list of matches.
-     * @param {boolean} force_refresh - if true, forces a refresh of the match list
-     * @returns {Array} the list of matches
-     */
-    async getMatches(force_refresh=false){
-        if (force_refresh || this.matches.length == 0){
-            await this._fetchMatches();
-        }
-
-        return this.matches;
-    }
-
-    /**
      * Extracts JSON data from a single row of the match table
      * @param {Object} row - the row to extract data from
      * @returns {Object} the extracted data
@@ -216,6 +205,106 @@ module.exports = class TMScraper {
                 team_2: strip(cols[2].textContent)
             }
         }
+    }
+
+    /**
+     * Returns the list of matches.
+     * @param {boolean} force_refresh - if true, forces a refresh of the match list
+     * @returns {Array} the list of matches
+     */
+    async getMatches(force_refresh=false){
+        if (force_refresh || this.matches.length == 0){
+            await this._fetchMatches();
+        }
+
+        return this.matches;
+    }
+
+    /**
+     * Fetches the current team rankings from the TM webpage
+     */
+    async _fetchRankings(){
+        // get the program, if it hasn't been determined yet
+        if (!this.program){
+            await this._fetchProgram();
+        }
+
+        let page_data = await this._makeRequest(`${this.division}/rankings`);
+        let page = new jsdom.JSDOM(page_data).window.document;
+        let rankings_list = [];
+        page.querySelectorAll('table.table-striped > tbody > tr').forEach(row => {
+            rankings_list.push(this._extractRankingData(row));
+        });
+        // console.log(rankings_list)
+        this.rankings = rankings_list;
+    }
+
+    /**
+     * Extracts JSON data from a single row of the rankings table
+     * @param {Object} row - the row to extract data from
+     * @returns {Object} the extracted data
+     */
+    _extractRankingData(row){
+        let cols = row.querySelectorAll('td');
+        if (this.program == "VRC" || this.program == "VEXU"){
+            // compute AWP rate and auton win rate
+            let wlt_split = cols[6].textContent.split("-");
+            let wins = Number(wlt_split[0]);
+            let losses = Number(wlt_split[1]);
+            let ties = Number(wlt_split[2]);
+            let win_wp = (wins*2) + ties;
+            let total_wp = Math.round(Number(cols[3].textContent) * (wins+losses+ties))
+            let awp_rate = (100 * (total_wp - win_wp) / (wins+losses+ties));
+            awp_rate = isNumber(awp_rate) ? awp_rate.toFixed(1) : "0.0";
+            
+            let num_auto_wins = Math.round(Number(cols[4].textContent) * (wins+losses+ties)) / 10;
+            let auto_win_rate = (100 * num_auto_wins / (wins+losses+ties));
+            auto_win_rate = isNumber(auto_win_rate) ? auto_win_rate.toFixed(1) : "0.0";
+
+            return {
+                rank: cols[0].textContent,
+                team: cols[1].textContent,
+                name: cols[2].textContent,
+                wp: cols[3].textContent,
+                ap: cols[4].textContent,
+                sp: cols[5].textContent,
+                wlt: cols[6].textContent,
+                awp_rate: `${awp_rate}%`,
+                auto_win_rate: `${auto_win_rate}%`
+            }
+        }
+        else if (this.program == "VIQC"){
+            return {
+                rank: cols[0].textContent,
+                team: cols[1].textContent,
+                name: cols[2].textContent,
+                matches: cols[3].textContent,
+                avg_score: cols[4].textContent
+            }
+        }
+        else if (this.program == "RADC"){
+            return{
+                rank: cols[0].textContent,
+                team: cols[1].textContent,
+                name: cols[2].textContent,
+                wp: cols[3].textContent,
+                sp: cols[4].textContent,
+                wlt: cols[5].textContent
+            }
+        }
+    }
+
+    /**
+     * Returns the list of rankings.
+     * @param {boolean} force_refresh - if true, forces a refresh of the rankings list
+     * @returns {Array} the list of rankings
+     */
+    async getRankings(force_refresh=false){
+        if (force_refresh || this.rankings.length == 0){
+            await this._fetchRankings();
+        }
+
+        return this.rankings;
     }
 
     /** 
@@ -426,3 +515,11 @@ function strip(str){
     return str.replace(/\s+/g, '');
 }
 
+/**
+ * Returns True if the given value is a number
+ * @param {*} value - value to check
+ * @returns {Boolean}
+ */
+function isNumber(value){
+    return typeof value === 'number' && isFinite(value);
+}
