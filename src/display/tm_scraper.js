@@ -37,6 +37,7 @@ module.exports = class TMScraper {
         this.teams = []; // list of teams
         this.matches = []; // list of matches
         this.rankings = []; // list of rankings
+        this.skills = []; // list of skills rankings
 
         this.socket = null; // websocket connection to the TM server
         this.onMatchQueueCallback = () => {}; // callback for when a match is queued
@@ -307,6 +308,55 @@ module.exports = class TMScraper {
         return this.rankings;
     }
 
+    /**
+     * Fetches the current skills rankings from the TM webpage
+     */
+    async _fetchSkills(){
+        // get the program, if it hasn't been determined yet
+        if (!this.program){
+            await this._fetchProgram();
+        }
+        let page_data = await this._makeRequest(`skills/rankings`);
+        let page = new jsdom.JSDOM(page_data).window.document;
+        let skills_list = [];
+        page.querySelectorAll('table.table-striped > tbody > tr').forEach(row => {
+            skills_list.push(this._extractSkillsData(row))
+        })
+        this.skills = skills_list;
+    }
+
+    /**
+     * Extracts JSON data from a single row of the skills table
+     * @param {Object} row - the row to extract data from
+     * @returns {Object} the extracted data
+     */
+    _extractSkillsData(row){
+        let cols = row.querySelectorAll('td');
+        return {
+            skills_rank: cols[0].textContent,
+            number: cols[1].textContent,
+            name: cols[2].textContent,
+            total_skills_score: cols[3].textContent,
+            high_programming: cols[4].textContent,
+            programming_attempts: cols[5].textContent,
+            high_driving: cols[6].textContent,
+            driving_attemps: cols[7].textContent
+        }
+    }
+
+    /**
+     * Returns the list of rankings.
+     * @param {boolean} force_refresh - if true, forces a refresh of the rankings list
+     * @returns {Array} the list of rankings
+     */
+     async getSkills(force_refresh=false){
+        if (force_refresh || this.skills.length == 0){
+            await this._fetchSkills();
+        }
+
+        return this.skills;
+    }
+
     /** 
      * Determines which program is being run (VRC, VIQC, VEXU, or RADC)
      */
@@ -447,6 +497,10 @@ module.exports = class TMScraper {
             await this._fetchMatches();
         }
 
+        // pull new ranking & skills data
+        await this._fetchRankings();
+        await this._fetchSkills();
+
         // for some reason some match numbers returned from the websocket have spaces in them
         match_num = strip(match_num);
 
@@ -501,15 +555,14 @@ module.exports = class TMScraper {
             await this._fetchTeams();
         }
 
-        // pull new ranking data
-        await this._fetchRankings();
-
         let team = this.teams.find(t => t.number == team_num);
         let team_rank = this.rankings.find(r => r.number == team_num);
+        let team_skills = this.skills.find(s => s.number == team_num)
         // return team;
         return {
             ...team,
-            ...team_rank
+            ...team_rank,
+            ...team_skills
         }
     }
 }
