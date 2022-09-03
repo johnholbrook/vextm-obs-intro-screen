@@ -47,6 +47,7 @@ hr.team-separator{
     position: absolute;
     bottom: 0;
     width: 100%;
+    transition: bottom 0.375s ease-in-out;
 }
 
 .intro{

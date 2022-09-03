@@ -227,37 +227,45 @@ function setProgram(program) {
     let radc_intro = document.querySelector("#radc-intro");
     switch (program) {
         case "VRC":
-            vrc_intro.style.display = "";
-            vexu_intro.style.display = "none";
-            viqc_intro.style.display = "none";
-            radc_intro.style.display = "none";
+            showElement(vrc_intro);
+            hideElement(vexu_intro);
+            hideElement(viqc_intro);
+            hideElement(radc_intro);
             break;
         case "VEXU":
-            vrc_intro.style.display = "none";
-            vexu_intro.style.display = "";
-            viqc_intro.style.display = "none";
-            radc_intro.style.display = "none";
+            hideElement(vrc_intro);
+            showElement(vexu_intro);
+            hideElement(viqc_intro);
+            hideElement(radc_intro);
             break;
         case "VIQC":
-            vrc_intro.style.display = "none";
-            vexu_intro.style.display = "none";
-            viqc_intro.style.display = "";
-            radc_intro.style.display = "none";
+            hideElement(vrc_intro);
+            hideElement(vexu_intro);
+            showElement(viqc_intro);
+            hideElement(radc_intro);
             break;
         case "RADC":
-            vrc_intro.style.display = "none";
-            vexu_intro.style.display = "none";
-            viqc_intro.style.display = "none";
-            radc_intro.style.display = "";
+            hideElement(vrc_intro);
+            hideElement(vexu_intro);
+            hideElement(viqc_intro);
+            showElement(radc_intro);
             break;
         case "none":
         default:
-            vrc_intro.style.display = "none";
-            vexu_intro.style.display = "none";
-            viqc_intro.style.display = "none";
-            radc_intro.style.display = "none";
+            hideElement(vrc_intro);
+            hideElement(vexu_intro);
+            hideElement(viqc_intro);
+            hideElement(radc_intro);
             break;
     }
+}
+
+function hideElement(element){
+    element.style.bottom = `-${element.offsetHeight}px`;
+}
+
+function showElement(element){
+    element.style.bottom = 0;
 }
 
 /**
