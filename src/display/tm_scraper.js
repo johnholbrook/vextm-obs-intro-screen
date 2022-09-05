@@ -236,8 +236,47 @@ module.exports = class TMScraper {
         page.querySelectorAll('table.table-striped > tbody > tr').forEach(row => {
             rankings_list.push(this._extractRankingData(row));
         });
-        // console.log(rankings_list)
+        
+        // for IQ only, add high match score
+        if (this.program == "VIQC"){
+            let high_scores = await this._fetchIQHighScores();
+            this.teams.forEach(team => {
+                rankings_list.find(r => r.number == team.number).high_score = high_scores[team.number]
+            });
+        }
+
         this.rankings = rankings_list;
+    }
+
+    /**
+     * Looks through the match list to compute each team's highest match score
+     */
+    async _fetchIQHighScores(){
+        // get the program, if it hasn't been determined yet
+        if (!this.program){
+            await this._fetchProgram();
+        }
+
+        // initialize the high scores table with a value of 0 for each team
+        let high_scores = {}
+        let teams = await this.getTeams();
+        teams.forEach(team => {
+            high_scores[team.number] = 0
+        });
+
+        let page_data = await this._makeRequest(`${this.division}/matches`);
+        let page = new jsdom.JSDOM(page_data).window.document;
+        page.querySelectorAll('table.table-striped > tbody > tr').forEach(row => {
+            let cols = row.querySelectorAll('td');
+            let team1 = strip(cols[1].textContent);
+            let team2 = strip(cols[2].textContent);
+            let score = Number(cols[3].textContent);
+            console.log(team1, team2, score)
+            if (score > high_scores[team1]) high_scores[team1] = score;
+            if (score > high_scores[team2]) high_scores[team2] = score;
+        });
+
+        return high_scores;
     }
 
     /**
