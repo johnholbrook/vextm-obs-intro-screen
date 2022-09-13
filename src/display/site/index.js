@@ -157,6 +157,7 @@ function showVIQCTeamInfo(teamid, info, show_stats, match_num){
  * @param {*} info - object with team info
  */
 function showVEXUTeamInfo(teamid, info, show_stats){
+    console.log(teamid);
     // show the team number/name/location
     document.querySelector(`#vexu-${teamid} .team-num`).innerHTML = info.number;
     document.querySelector(`#vexu-${teamid} .team-name`).innerHTML = info.name;
@@ -165,6 +166,17 @@ function showVEXUTeamInfo(teamid, info, show_stats){
     // show team ranking
     document.querySelector(`#vexu-${teamid} .team-rank`).innerHTML = info.rank;
     document.querySelector(`#vexu-${teamid} .team-rank-area .team-wlt`).innerHTML = `(${info.wlt})`;
+
+    // if this is an elimination match, show the seed for the whole alliance rather than the rank for this team
+    if (info.seed){
+        document.querySelector(`#vexu-${teamid} .team-rank-area`).style.display = "none";
+        document.querySelector(`#vexu-${teamid}-seed-area`).style.display = "";
+        document.querySelector(`#vexu-${teamid}-seed`).innerHTML = info.seed;
+    }
+    else{
+        document.querySelector(`#vexu-${teamid} .team-rank-area`).style.display = "";
+        document.querySelector(`#vexu-${teamid}-seed-area`).style.display = "none";
+    }
 
     if (show_stats){
         // if we have team stats, show them

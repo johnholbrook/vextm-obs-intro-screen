@@ -547,15 +547,27 @@ module.exports = class TMScraper {
             let matchnum = strip(cols[0].textContent);
             if (!qp_re.test(matchnum.substring(0,2))){
                 // this is an elimination match
-                let red1 = strip(cols[1].textContent);
-                let red2 = strip(cols[2].textContent);
-                let blue1 = strip(cols[3].textContent);
-                let blue2 = strip(cols[4].textContent);
 
-                if (!seeds.hasOwnProperty(red1)) seeds[red1] = seedLookupTable[matchnum].red;
-                if (!seeds.hasOwnProperty(red2)) seeds[red2] = seedLookupTable[matchnum].red;
-                if (!seeds.hasOwnProperty(blue1)) seeds[blue1] = seedLookupTable[matchnum].blue;
-                if (!seeds.hasOwnProperty(blue2)) seeds[blue2] = seedLookupTable[matchnum].blue;
+                if (cols.length == 7){
+                    // VRC or RADC
+                    let red1 = strip(cols[1].textContent);
+                    let red2 = strip(cols[2].textContent);
+                    let blue1 = strip(cols[3].textContent);
+                    let blue2 = strip(cols[4].textContent);
+
+                    if (!seeds.hasOwnProperty(red1)) seeds[red1] = seedLookupTable[matchnum].red;
+                    if (!seeds.hasOwnProperty(red2)) seeds[red2] = seedLookupTable[matchnum].red;
+                    if (!seeds.hasOwnProperty(blue1)) seeds[blue1] = seedLookupTable[matchnum].blue;
+                    if (!seeds.hasOwnProperty(blue2)) seeds[blue2] = seedLookupTable[matchnum].blue;
+                }
+                else if (cols.length == 5){
+                    // VEXU or WVSSAC
+                    let red = strip(cols[1].textContent);
+                    let blue = strip(cols[2].textContent);
+
+                    if (!seeds.hasOwnProperty(red)) seeds[red] = seedLookupTable[matchnum].red;
+                    if (!seeds.hasOwnProperty(blue)) seeds[blue] = seedLookupTable[matchnum].blue;
+                }
             }
         });
 
@@ -722,18 +734,32 @@ module.exports = class TMScraper {
 
         // console.log(match);
 
-        if (this.program == "VRC" || this.program == "RADC"){
+        if (this.program == "VRC" || this.program == "RADC" || this.program == "VEXU"){
             // if this is an elimination match, get bracket seedings
             const qp_re = new RegExp('[QP][1-9]'); // regex to match practice or qualification match numbers
             let seeds = qp_re.test(match_num) ? null : await this._calculateElimSeeds();
 
-            return await {
-                match_num: match_num,
-                program: this.program,
-                red_1: { ...(await this._getTeamData(match.red_1)), ...(seeds ? {seed: seeds[match.red_1]} : {}) },
-                red_2: { ...(await this._getTeamData(match.red_2)), ...(seeds ? {seed: seeds[match.red_2]} : {}) },
-                blue_1: { ...(await this._getTeamData(match.blue_1)), ...(seeds ? {seed: seeds[match.blue_1]} : {}) },
-                blue_2: { ...(await this._getTeamData(match.blue_2)), ...(seeds ? {seed: seeds[match.blue_2]} : {}) },
+            console.log(match)
+
+            if (!match.red_2 && !match.blue_2){
+                // special case for WVSSAC Robotics events where eliminations are 1v1
+                // https://www.wvroboticsalliance.org/programs/wvssac-robotics/rules
+                return await {
+                    match_num: match_num,
+                    program: this.program,
+                    red_1: { ...(await this._getTeamData(match.red_1)), ...(seeds ? {seed: seeds[match.red_1]} : {}) },
+                    blue_1: { ...(await this._getTeamData(match.blue_1)), ...(seeds ? {seed: seeds[match.blue_1]} : {}) },
+                }
+            }
+            else{
+                return await {
+                    match_num: match_num,
+                    program: this.program,
+                    red_1: { ...(await this._getTeamData(match.red_1)), ...(seeds ? {seed: seeds[match.red_1]} : {}) },
+                    red_2: { ...(await this._getTeamData(match.red_2)), ...(seeds ? {seed: seeds[match.red_2]} : {}) },
+                    blue_1: { ...(await this._getTeamData(match.blue_1)), ...(seeds ? {seed: seeds[match.blue_1]} : {}) },
+                    blue_2: { ...(await this._getTeamData(match.blue_2)), ...(seeds ? {seed: seeds[match.blue_2]} : {}) },
+                }
             }
         }
         else if (this.program == "VEXU"){
