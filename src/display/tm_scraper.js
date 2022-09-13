@@ -499,7 +499,7 @@ module.exports = class TMScraper {
             "R165-1" : {red: 2, blue: 15},
             "R166-1" : {red: 7, blue: 10},
             "R167-1" : {red: 3, blue: 14},
-            "R169-1" : {red: 6, blue: 11},
+            "R168-1" : {red: 6, blue: 11},
             // we need to do all the elimination matches, not just R16, because if there are < 32 teams some alliances will get byes
             "QF1-1" : {red: 1, blue: 8},
             "QF2-1" : {red: 4, blue: 5},
@@ -507,7 +507,25 @@ module.exports = class TMScraper {
             "QF4-1" : {red: 3, blue: 6},
             "SF1-1" : {red: 1, blue: 4},
             "SF2-1" : {red: 2, blue: 3},
-            "F1" : {red: 1, blue: 2}
+            "F1" : {red: 1, blue: 2},
+            // and let's do R32 as well just for fun
+            "R321-1": {red: 1, blue: 32},
+            "R322-1": {red: 16, blue: 17},
+            "R323-1": {red: 8, blue: 25},
+            "R324-1": {red: 9, blue: 24},
+            "R325-1": {red: 4, blue: 29},
+            "R326-1": {red: 13, blue: 20},
+            "R327-1": {red: 5, blue: 28},
+            "R328-1": {red: 12, blue: 21},
+            "R329-1": {red: 2, blue: 31},
+            "R3210-1": {red: 15, blue: 18},
+            "R3211-1": {red: 7, blue: 26},
+            "R3212-1": {red: 10, blue: 23},
+            "R3213-1": {red: 3, blue: 30},
+            "R3214-1": {red: 14, blue: 19},
+            "R3215-1": {red: 6, blue: 27},
+            "R3216-1": {red: 11, blue: 22},
+            // TM technically supports elimination brackets with up to 128 alliances but c'mon, no one ever goes beyond 32
         }
         const qp_re = new RegExp('[QP][1-9]');// regex to match practice or qualification match numbers
 

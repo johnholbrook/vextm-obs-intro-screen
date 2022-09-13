@@ -137,8 +137,9 @@ hr.team-separator{
 }
 
 .seed-area{
-    width: 4rem;
-    flex: 0 0 auto;
+    /* width: 4rem; */
+    max-width: 5rem;
+    flex: 1 0 auto;
     font-size: 1rem;
     text-align: center;
     margin-top: auto;
