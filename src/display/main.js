@@ -78,18 +78,19 @@ async function main(){
     let team_stats = null;
     let program = await tm_scraper.getProgram();
     // if (args['show-stats'] && program != "VEXU"){ // stats for U aren't supported yet
-    if (args['show-stats']){
-        let team_numbers = (await tm_scraper.getTeams()).map(t => t.number);
-        team_stats = new stats(program, team_numbers);
-        team_stats.start(480);
-    }
+    // if (args['show-stats']){
+    //     let team_numbers = (await tm_scraper.getTeams()).map(t => t.number);
+    //     team_stats = new stats(program, team_numbers);
+    //     team_stats.start(480);
+    // }
 
     // when a new match is queued, send the info to all connected clients
     tm_scraper.onMatchQueue(async (m) => {
         // add team scouting data, if applicable
         // if (args['show-stats'] && tm_scraper.program != "VEXU"){ // stats for U aren't supported yet
         if (args['show-stats']){
-            m = await team_stats.AddTeamStats(m);
+            // m = await team_stats.AddTeamStats(m);
+            m.show_stats = true;
         }
 
         // add match prediction, if applicable
@@ -113,6 +114,9 @@ async function main(){
 
     // start the web server
     server.startServer(args.port);
+
+    // tm_scraper.getRankings(true);
+    // console.log(await tm_scraper._fetchElimSeeds());
 }
 
 main();
