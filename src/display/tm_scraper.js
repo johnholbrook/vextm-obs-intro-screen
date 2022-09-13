@@ -739,8 +739,6 @@ module.exports = class TMScraper {
             const qp_re = new RegExp('[QP][1-9]'); // regex to match practice or qualification match numbers
             let seeds = qp_re.test(match_num) ? null : await this._calculateElimSeeds();
 
-            console.log(match)
-
             if (!match.red_2 && !match.blue_2){
                 // special case for WVSSAC Robotics events where eliminations are 1v1
                 // https://www.wvroboticsalliance.org/programs/wvssac-robotics/rules

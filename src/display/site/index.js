@@ -96,6 +96,18 @@ function showRADCTeamInfo(teamid, info, show_stats){
     document.querySelector(`#radc-${teamid} .team-rank`).innerHTML = info.rank;
     document.querySelector(`#radc-${teamid} .team-rank-area .team-wlt`).innerHTML = `(${info.wlt})`;
 
+    // if this is an elimination match, show the seed for the whole alliance rather than the rank for this team
+    let color = teamid.slice(0, teamid.length-1);
+    if (info.seed){
+        document.querySelector(`#radc-${teamid} .team-rank-area`).style.display = "none";
+        document.querySelector(`#radc-${color}-seed-area`).style.display = "";
+        document.querySelector(`#radc-${color}-seed`).innerHTML = info.seed;
+    }
+    else{
+        document.querySelector(`#radc-${teamid} .team-rank-area`).style.display = "";
+        document.querySelector(`#radc-${color}-seed-area`).style.display = "none";
+    }
+
     if (show_stats){
         // if we have team stats, show them
         document.querySelector(`#radc-${teamid} .team-stats`).style.display = "";
