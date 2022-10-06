@@ -220,7 +220,7 @@ function disableInputs(){
     predictMatchCheckbox.setEnabled(false);
     omitCountryCheckbox.setEnabled(false);
     showStatsCheckbox.setEnabled(false);
-    playSoundsCheckbox.setEnabled(false);
+    // playSoundsCheckbox.setEnabled(false);
 }
 
 // re-enable all the inputs
@@ -233,7 +233,7 @@ function enableInputs(){
     predictMatchCheckbox.setEnabled(true);
     omitCountryCheckbox.setEnabled(true);
     showStatsCheckbox.setEnabled(true);
-    playSoundsCheckbox.setEnabled(true);
+    // playSoundsCheckbox.setEnabled(true);
 }
 
 // print some text to the output area
