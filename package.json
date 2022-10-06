@@ -1,13 +1,15 @@
 {
   "name": "vextm-intro-screen",
-  "version": "1.4.0",
+  "version": "2.0.0",
   "main": "index.js",
   "author": "John Holbrook",
   "license": "MIT",
   "private": true,
   "scripts": {
     "build-gui": "webpack --mode production && npx nodegui-packer --pack ./dist && copy-display-files.bat && node change_icon.js",
-    "build-display": "pkg -t node14-win-x64 -o ./display.exe ./src/display/main.js",
+    "build-display-win": "pkg -t node14-win-x64 -o ./display.exe ./src/display/main.js",
+    "build-display-mac": "pkg -t node14-macos-x64 -o ./display-mac ./src/display/main.js",
+    "build-display": "npm run build-display-win && npm run build-display-mac",
     "build": "npm run build-display && npm run build-gui",
     "start": "qode ./src/index.js",
     "debug": "webpack && qode --inspect ./dist/index.js"
