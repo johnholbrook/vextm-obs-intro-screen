@@ -175,7 +175,9 @@ function startProcess(){
     const showStats = showStatsCheckbox.isChecked();
     // const playSounds = playSoundsCheckbox.isChecked();
 
-    display_process = spawn("./display.exe", [
+    let display_exec_name = process.platform == "darwin" ? "./display-mac" : "./display.exe";
+
+    display_process = spawn(display_exec_name, [
         "-a", address, 
         "-p", password,
         "--port", port,

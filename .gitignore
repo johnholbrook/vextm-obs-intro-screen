@@ -1,6 +1,8 @@
 node_modules
 dist/
 deploy/win32/build/
+deploy/darwin/build
+deploy/darwin/*.app
 *.log
 .vscode
 .DS_Store
