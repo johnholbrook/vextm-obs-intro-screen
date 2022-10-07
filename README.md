@@ -1,7 +1,7 @@
 # vextm-obs-intro-screen
 Alternate "Match Intro" screen for VEX Tournament Manager.
- 
-![intro_ex](https://user-images.githubusercontent.com/3682581/152690268-063b8e86-739c-4fb8-9dac-3fa4223b867b.png)
+
+https://user-images.githubusercontent.com/3682581/194567886-0c53670f-0e5d-4d73-ab31-4e06dcb64c54.mp4
 
 Features:
 * Shows information which isn't included in TM's overlay intro screen, such as team names and locations.
