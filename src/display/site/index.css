@@ -103,10 +103,11 @@ hr.team-separator{
     flex-direction: row;
 }
 .team-bio{
-    width: 70%;
+    /* width: 70%; */
+    flex-grow: 1;
 }
 .team-stats{
-    width: 30%;
+    /* width: 30%; */
     font-size: 1.5rem;
 }
 .left .team-stats{

@@ -9,7 +9,8 @@ const util = require('util');
 const axios = require('axios');
 const jsdom = require('jsdom');
 const WebSocket = require('ws');
-const { match } = require('assert');
+// const { match } = require('assert');
+const protobuf = require('protobufjs');
 
 /**
  * @class TMScraper
@@ -41,9 +42,15 @@ module.exports = class TMScraper {
         this.skills = []; // list of skills rankings
 
         this.socket = null; // websocket connection to the TM server
+        this.pb = null; // protobuf schema used by TM server
+        this.fs_notice = null; // protobuf info for "Field Set Notice" message type
+
         this.onMatchQueueCallback = () => {}; // callback for when a match is queued
         this.onMatchStartedCallback = () => {}; // callback for when a match is started
         this.onTimeUpdatedCallback = () => {}; // callback for when the match time is updated (i.e., once per second during the match)
+   
+        // initialize websocket connection
+        this._connectWebsocket();
     }
 
     /**
@@ -86,7 +93,7 @@ module.exports = class TMScraper {
         // console.log(url);
         let options = {
             headers: {
-                Cookie: this.cookie
+                Cookie: this.cookie,
             }
         };
 
@@ -630,6 +637,10 @@ module.exports = class TMScraper {
             // this.websocket = null;
         }
 
+        // open and parse the protobuf schema
+        this.pb = await protobuf.load("./src/display/fieldset.proto");
+        this.fs_notice = this.pb.lookupType("FieldSetNotice");
+
         this.websocket = new WebSocket(`ws://${this.addr}/fieldsets/${this.fs}`, {
             headers: {
                 Cookie: this.cookie
@@ -638,37 +649,127 @@ module.exports = class TMScraper {
 
         this.websocket.on('open', () => {
             console.log('WebSocket connected');
+
+            // send handshake to TM
+            let hs = this._generateHandshake();
+            console.log("Initiating handshake...");
+            this._wsSend(hs); 
         });
+
         this.websocket.on('close', () => {
             console.log('WebSocket disconnected');
         });
+
         this.websocket.on('message', async event => {
-            let data = JSON.parse(event.toString());
-            // console.log(data);
-            await this._handleEvent(data);
+            await this._handleEvent(event);
         });
+    }
+
+    /**
+     * Send a message to the TM server via websockets
+     * @param {Buffer} data - data to send
+     */
+    async _wsSend(data){
+        await this._connectWebsocket();
+        this.websocket.send(data);
+    }
+
+    /**
+     * Generates the "handshake message" needed to send to TM.
+     * The message is 128 bytes long, namely:
+     * - 7 bytes of padding (content irrelevant)
+     * - Current UNIX timestamp in seconds since epoch (little-endian). Must be within 300s of TM server's time for handshake to be accepted.
+     * - 117 bytes of padding (content irrelevant)
+     * Yes, really. ¯\_(ツ)_/¯
+     */
+    _generateHandshake(){
+        let unixTime = (Math.floor(Date.now() / 1000)).toString(16); // unix timestamp in big-endian hex
+        
+        // create byte array
+        let hs = new Uint8Array(128);
+
+        // write time to byte array (little-endian)
+        hs[7]  = parseInt(unixTime.slice(6,8), 16);
+        hs[8]  = parseInt(unixTime.slice(4,6), 16);
+        hs[9]  = parseInt(unixTime.slice(2,4), 16);
+        hs[10] = parseInt(unixTime.slice(0,2), 16);
+        
+        return hs;
+    }
+
+    /**
+     * "Unmangles" a message recieved from the TM server into something decodable as a protobuf
+     */
+    _unmangle(raw_data){
+        let magic_number = raw_data[0] ^ 229;
+        // console.log("Magic number: ", magic_number);
+
+        let unmangled_data = Buffer.alloc(raw_data.length-1);
+        for (let i=1; i<raw_data.length; i++){
+            unmangled_data[i-1] = raw_data[i] ^ magic_number;
+        }
+
+        return unmangled_data;
+    }
+
+    /**
+     * Generates a match name as displayed in TM (e.g. "Q123" or "SF 1-1")
+     * from a V3MatchTuple object 
+     * @param {Object} match 
+     * @returns Name of the match as displayed in TM
+     */
+    _buildMatchName(match){
+        const elim_rounds = {
+            3: "QF",
+            4: "SF",
+            5: "F",
+            6: "R16",
+            7: "R32",
+            8: "R64",
+            9: "R128"
+        }
+        
+        if (match.round == 2) {
+            return `Q${match.match}`;
+        }
+        else if (match.round in elim_rounds.keys()){
+            return `${elim_rounds[match.round]} ${match.isntance}-${match.round}`
+        }
+        else if (match.round == 0) return "NONE";
+        else if (match.round == 1) return "P0";
+        else if (match.round == 18) return "TO";
+        else if (match.round == 17){
+            // RIP to the name "Programming Skills", 2007 - 2023 :(
+            return match.instance == 2 ? "D Skills" : "A Coding";
+        }
+        else return "OTHER";
     }
 
     /**
      * Handles an event from the TM server (recieved via websockets).
      */
     async _handleEvent(event){
-        if (event.type == "fieldMatchAssigned"){
-            // console.log(`Match Queued: ${event.name}`)
-            let ingore = ["Unknown", "P0", "D Skills", "P Skills"]
-            if (!ingore.includes(event.name)){
-                // a match name "unknown" means there is no match queued
-                // also ignore "P0" which is the practice match with no teams
-                // and skills matches (no teams there either)
-                let match_info = await this.getMatchTeams(event.name);
+        // console.log("Recieved: ", event);
+        let unmangled_event = this._unmangle(event);
+        let decoded = this.fs_notice.decode(unmangled_event);
+        
+        console.log(decoded);
+
+        if (decoded.id == 8) { // ASSIGN_FIELD_MATCH – i.e. match queued
+            const ingore = [0, 1, 17, 18];
+            if (!ingore.includes(decoded.match.round)){
+                // `ignore` is a list of match types that the intro display should
+                // ignore (Practice, Skills, Timeout, etc.)
+                let match_name = this._buildMatchName(decoded.match);
+                let match_info = await this.getMatchTeams(match_name);
                 this.onMatchQueueCallback(match_info);
             }
         }
-        else if (event.type == "matchStarted"){
+        else if (decoded.id == 1){ // MATCH_STARTED
             this.onMatchStartedCallback();
         }
-        else if (event.type == "timeUpdated"){
-            this.onTimeUpdatedCallback(event);
+        else if (decoded.id == 8){ // TIME_UPDATED
+            this.onMatchQueueCallback();
         }
         // there are various other event types too, but for now we don't care about them
     }
@@ -679,7 +780,7 @@ module.exports = class TMScraper {
      */
     async onMatchQueue(callback){
         this.onMatchQueueCallback = callback;
-        await this._connectWebsocket();
+        // await this._connectWebsocket();
     }
 
     /**
@@ -688,7 +789,7 @@ module.exports = class TMScraper {
      */
     async onMatchStarted(callback){
         this.onMatchStartedCallback = callback;
-        await this._connectWebsocket();
+        // await this._connectWebsocket();
     }
 
     /**
@@ -698,7 +799,7 @@ module.exports = class TMScraper {
      */
     async onMatchTimeUpdated(callback){
         this.onTimeUpdatedCallback = callback;
-        await this._connectWebsocket();
+        // await this._connectWebsocket();
     }
 
     /**
