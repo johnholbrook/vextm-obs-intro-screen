@@ -103,7 +103,7 @@ fieldSetRowLayout.addWidget(fieldSetInput);
 
 // checkbox to show match predictions
 const predictMatchCheckbox = new QCheckBox();
-predictMatchCheckbox.setText("Show match prediction (VRC only)");
+predictMatchCheckbox.setText("Show match prediction on intro (VRC only)");
 
 // checkbox to shorten team locations
 const omitCountryCheckbox = new QCheckBox();
@@ -112,8 +112,12 @@ omitCountryCheckbox.setChecked(true);
 
 // checkbox to show scouting data
 const showStatsCheckbox = new QCheckBox();
-showStatsCheckbox.setText("Show team scouting data");
+showStatsCheckbox.setText("Show team scouting data on intro");
 showStatsCheckbox.setChecked(true);
+
+const showFieldCheckbox = new QCheckBox();
+showFieldCheckbox.setText("Show field name on intro");
+showFieldCheckbox.setChecked(true);
 
 // // checkbox to play VRC sound effects
 // const playSoundsCheckbox = new QCheckBox();
@@ -145,6 +149,7 @@ optionsAreaLayout.addWidget(predictMatchCheckbox);
 // optionsAreaLayout.addWidget(playSoundsCheckbox);
 optionsAreaLayout.addWidget(omitCountryCheckbox);
 optionsAreaLayout.addWidget(showStatsCheckbox);
+optionsAreaLayout.addWidget(showFieldCheckbox);
 
 rootViewLayout.addWidget(optionsArea);
 rootViewLayout.addWidget(serverOutput);
@@ -173,6 +178,7 @@ function startProcess(){
     const predict = predictMatchCheckbox.isChecked();
     const omitCountry = omitCountryCheckbox.isChecked();
     const showStats = showStatsCheckbox.isChecked();
+    const showField = showFieldCheckbox.isChecked();
     // const playSounds = playSoundsCheckbox.isChecked();
 
     let display_exec_name = process.platform == "darwin" ? "./display-mac" : "./display.exe";
@@ -186,6 +192,7 @@ function startProcess(){
         ...(predict ? ["-g"] : []),
         ...(omitCountry ? ["-o"] : []),
         ...(showStats ? ["-s"] : []),
+        ...(showField ? ["-n"] : []),
         // ...(playSounds ? ["--sounds"] : [])
     ]);
     display_process.stdout.on("data", b => {
@@ -220,6 +227,7 @@ function disableInputs(){
     predictMatchCheckbox.setEnabled(false);
     omitCountryCheckbox.setEnabled(false);
     showStatsCheckbox.setEnabled(false);
+    showFieldCheckbox.setEnabled(false);
     // playSoundsCheckbox.setEnabled(false);
 }
 
@@ -233,6 +241,7 @@ function enableInputs(){
     predictMatchCheckbox.setEnabled(true);
     omitCountryCheckbox.setEnabled(true);
     showStatsCheckbox.setEnabled(true);
+    showFieldCheckbox.setEnabled(true);
     // playSoundsCheckbox.setEnabled(true);
 }
 
