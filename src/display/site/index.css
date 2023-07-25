@@ -50,6 +50,27 @@ hr.team-separator{
     transition: bottom 0.375s ease-in-out;
 }
 
+.field-name-container{
+    /* display: block; */
+    text-align: center;
+}
+
+.field-name{
+    font-size: 1.5rem;
+    /* font-weight: bold; */
+    display: inline-block;
+    margin: 0 auto;
+
+    color:white;
+    background-color: rgb(157,157,157);
+    text-align: center;
+
+    border-radius: 0.25em 0.25em 0 0;
+    padding: 0 0.5rem;
+    
+    /* margin-bottom: 0; */
+}
+
 .intro{
     width: 98.5%;
     font-size: 2rem;
@@ -68,7 +89,9 @@ hr.team-separator{
     padding: 0.5rem 1rem;
     display: flex;
 }
-
+#viqc-intro .alliance {
+    width: 100%;
+}
 
 .alliance.left{
     border-top-left-radius: 1rem;
@@ -77,13 +100,31 @@ hr.team-separator{
     border-top-right-radius: 1rem;
 }
 
-#viqc-intro .left{
+/* #viqc-intro .left{
     border-top-right-radius: 1rem;
     margin-right: 0.5rem;
 }
 #viqc-intro .right{
     border-top-left-radius: 1rem;
     margin-left: 0.5rem;
+} */
+
+.vertical-line-wrapper{
+    background-color: rgb(0,118,190);
+    display: flex;
+    width: 0.5rem;
+    /* height: 100%; */
+}
+
+.vertical-line{
+    border-left: thin solid rgb(200,200,200);
+    margin: 1rem auto;
+    /* padding-top: 0.5rem;
+    padding-bottom: 0.5rem; */
+}
+
+#viqc-intro .team-rank-area{
+    min-width: 4rem;
 }
 
 .right{

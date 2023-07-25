@@ -58,6 +58,12 @@ const args = yargs.command("match-intro", "Serve a match intro screen")
                     type: "boolean",
                     default: false
                   })
+                  .option('show-field-name', {
+                    alias: 'n',
+                    description: "Show field name on intro display",
+                    type: "boolean",
+                    default: false
+                  })
                   .option('help', {
                     alias: 'h',
                     description: "Display this help message and exit",
@@ -72,7 +78,7 @@ async function main(){
     }
 
     // create the TM scraper
-    let tm_scraper = new TMScraper(args.address, args.password, args['division-name'], args['field-set'], args['omit-country']);
+    let tm_scraper = new TMScraper(args.address, args.password, args['division-name'], args['field-set'], args['omit-country'], args['show-field-name']);
 
     // start fetching team stats, if applicable
     let team_stats = null;

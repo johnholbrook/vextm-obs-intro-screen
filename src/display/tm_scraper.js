@@ -25,12 +25,13 @@ module.exports = class TMScraper {
      * @param {*} fs ID of the field set to connect to
      * @param {boolean} omit Omit country from team name if there is also a state/province
      */
-    constructor(addr, pw, div, fs, omit){
+    constructor(addr, pw, div, fs, omit, show_field){ 
         this.addr = addr; // TM server address
         this.pw = pw; // TM admin password
         this.division = div; // name of the division (as used in the web interface URLs, e.g. "division1")
         this.fs = fs; // ID of the field set to connect to (starts at 1 and counts up from there)
-        this.omit = omit ? true:false;
+        this.omit = omit ? true:false; // If true, strip country name from team location iff there's a state/province
+        this.show_field = show_field ? true:false; // If true, send field name with match data
         
         this.program = null; // the program (e.g. "VRC", "VEXU", "VIQC")
         this.cookie = null; // the session cookie
@@ -40,6 +41,9 @@ module.exports = class TMScraper {
         this.matches = []; // list of matches
         this.rankings = []; // list of rankings
         this.skills = []; // list of skills rankings
+
+        this.fieldList = null; // object mapping field IDs to field names
+        this.currentFieldId = 0; // Field ID for currently-queued match
 
         this.socket = null; // websocket connection to the TM server
         this.pb = null; // protobuf schema used by TM server
@@ -756,12 +760,16 @@ module.exports = class TMScraper {
         // console.log(decoded);
 
         if (decoded.id == 8) { // ASSIGN_FIELD_MATCH – i.e. match queued
+            // update the current field ID
+            this.currentFieldId = decoded.fieldId ? decoded.fieldId : 0;
+
             const ingore = [0, 1, 17, 18];
             if (!ingore.includes(decoded.match.round)){
                 // `ignore` is a list of match types that the intro display should
                 // ignore (Practice, Skills, Timeout, etc.)
                 let match_name = this._buildMatchName(decoded.match);
                 let match_info = await this.getMatchTeams(match_name);
+                if (this.show_field) match_info.field_name = this.fieldList[this.currentFieldId];
                 this.onMatchQueueCallback(match_info);
             }
         }
@@ -771,6 +779,10 @@ module.exports = class TMScraper {
         else if (decoded.id == 8){ // TIME_UPDATED
             this.onMatchQueueCallback();
         }
+        else if (decoded.id == 13){ // field list
+            this.fieldList = {0: "N/A", ...decoded.fields}
+        }
+        
         // there are various other event types too, but for now we don't care about them
     }
 

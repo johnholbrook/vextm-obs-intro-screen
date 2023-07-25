@@ -213,6 +213,16 @@ function showVEXUTeamInfo(teamid, info, show_stats){
 function showIntro(match) {
     setProgram(match.program);
     
+    // show field name, if applicable
+    let pl = match.program.toLowerCase();
+    if (match.field_name){
+        document.querySelector(`#${pl}-intro .field-name-container`).style.display = "";
+        document.querySelector(`#${pl}-intro .field-name`).innerHTML = match.field_name;
+    }
+    else{
+        document.querySelector(`#${pl}-intro .field-name-container`).style.display = "none";
+    }
+
     // set the team info
     if (match.program == "VRC"){
         if (!match.red_2 && !match.blue_2){
