@@ -193,7 +193,7 @@ module.exports = class TMScraper {
                 // this is a special case for WVSSAC Robotics, where qualification
                 // matches are 2v2 but eliminations are 1v1. Therefore you have a VRC
                 // match with only 1 team on each alliance.
-                // https://www.wvroboticsalliance.org/programs/wvssac-robotics/rules
+                // https://www.wvrobot.org/programs/wvssac-robotics/rules
                 return {
                     match_num: strip(cols[0].textContent),
                     red_1: strip(cols[1].textContent),
@@ -753,7 +753,7 @@ module.exports = class TMScraper {
         let unmangled_event = this._unmangle(event);
         let decoded = this.fs_notice.decode(unmangled_event);
         
-        console.log(decoded);
+        // console.log(decoded);
 
         if (decoded.id == 8) { // ASSIGN_FIELD_MATCH – i.e. match queued
             const ingore = [0, 1, 17, 18];

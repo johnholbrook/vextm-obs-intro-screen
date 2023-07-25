@@ -11,7 +11,7 @@
     "build-display-mac": "pkg -t node14-macos-x64 -o ./display-mac ./src/display/main.js",
     "build-display": "npm run build-display-win && npm run build-display-mac",
     "build": "npm run build-display && npm run build-gui",
-    "start": "qode ./src/index.js",
+    "start": "npm run build-display && qode ./src/index.js",
     "debug": "webpack && qode --inspect ./dist/index.js"
   },
   "dependencies": {
