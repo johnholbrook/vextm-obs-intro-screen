@@ -48,6 +48,11 @@ var server = http.createServer(function(req, res) {
         res.writeHead(200, {'Content-Type': getMimeType(filePath)});
         res.write(fs.readFileSync(filePath));
     }
+    // else, if appending ".html" to the file path results in a file that exists, send that
+    else if (fs.existsSync(`${filePath}.html`)){
+        res.writeHead(200, {'Content-Type': "text/html"});
+        res.write(fs.readFileSync(`${filePath}.html`));
+    }
     // if not, check to see if it's one of the special cases
     else if (includePaths.hasOwnProperty(req.url)) {
         // console.log(`Serving ${includePaths[req.url]}`);
