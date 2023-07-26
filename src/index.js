@@ -3,7 +3,7 @@ const { spawn } = require("child_process");
 
 // create the window
 const win = new QMainWindow();
-win.setWindowTitle("VEX TM Intro Screen");
+win.setWindowTitle("TM Stream Widgets");
 win.resize(400, 480);
 
 // set the window icon

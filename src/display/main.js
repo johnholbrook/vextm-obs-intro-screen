@@ -6,7 +6,7 @@ const stats = require("./team_stats.js");
 
 // set up command-line args
 const yargs = require('yargs');
-const args = yargs.command("match-intro", "Serve a match intro screen")
+const args = yargs.command("tm-stream-widgets", "Serve additional TM displays as web pages")
                   .option('address', {
                     alias: 'a',  
                     description: "VEX TM Server Address",
