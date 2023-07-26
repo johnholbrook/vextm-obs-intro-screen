@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Match Score Display</title>
+        <link rel="stylesheet" href="/lib/bootstrap.min.css">
+        <link rel="stylesheet" href="score.css">
+        <script src="/lib/socket.io.js"></script>
+        <script src="score.js"></script>
+    </head>
+    <body>
+        <div class="match-name-wrapper">
+            <span class="match-name grey bold">
+                Qualification 1
+            </span>
+        </div>
+        
+        <div id="vrc-teams" class="team-info-wrapper">
+            <div class="alliance red left">
+                <span class="team-area">
+                    <div class="team" id="vrc-red1">
+                        <div class="rank-area">
+                            <div class="rank">4</div>
+                            <div class="wlt">(7-0-0)</div>
+                        </div>
+                        <div class="team-bio">
+                            <span class="team-num bold">8768A</span>
+                            <span class="team-name">BACKDRIVE</span>
+                            <br>
+                            <span class="team-loc">Huntington, West Virginia</span>
+                        </div>
+                        <div class="team-stats">
+                            <span>Avg. WP</span>
+                            <span class="team-wp bold">2.67</span>
+                            <br>
+                            <span>AWP Rate</span>
+                            <span class="team-awp bold">20%</span>
+                            <br>
+                            <span>Auto Win</span>
+                            <span class="team-auto-rate bold">50%</span>
+                        </div>
+                    </div>
+                
+                    <hr>
+
+                    <div class="team" id="vrc-red2">
+                        <div class="rank-area">
+                            <div class="rank">4</div>
+                            <div class="wlt">(7-0-0)</div>
+                        </div>
+                        <div class="team-bio">
+                            <span class="team-num bold">62629W</span>
+                            <span class="team-name">Iron Patriots Mk. XVIII</span>
+                            <br>
+                            <span class="team-loc">Huntington, West Virginia</span>
+                        </div>
+                        <div class="team-stats">
+                            <span>Avg. WP</span>
+                            <span class="team-wp bold">2.67</span>
+                            <br>
+                            <span>AWP Rate</span>
+                            <span class="team-awp bold">20%</span>
+                            <br>
+                            <span>Auto Win</span>
+                            <span class="team-auto-rate bold">50%</span>
+                        </div>
+                    </div>
+                </span>
+            </div>
+
+            <div class="alliance blue right align-right">
+                <span class="team-area">
+                    <div class="team" id="vrc-blue1">
+                        <div class="team-stats">
+                            <span>Avg. WP</span>
+                            <span class="team-wp bold">2.67</span>
+                            <br>
+                            <span>AWP Rate</span>
+                            <span class="team-awp bold">20%</span>
+                            <br>
+                            <span>Auto Win</span>
+                            <span class="team-auto-rate bold">50%</span>
+                        </div>
+                        <div class="team-bio">
+                            <span class="team-num bold">1234A</span>
+                            <span class="team-name">My Great Team Name</span>
+                            <br>
+                            <span class="team-loc">Huntington, West Virginia</span>
+                        </div>
+                        <div class="rank-area">
+                            <div class="rank">4</div>
+                            <div class="wlt">(7-0-0)</div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="team" id="vrc-blue2">
+                        <div class="team-stats">
+                            <span>Avg. WP</span>
+                            <span class="team-wp bold">2.67</span>
+                            <br>
+                            <span>AWP Rate</span>
+                            <span class="team-awp bold">20%</span>
+                            <br>
+                            <span>Auto Win</span>
+                            <span class="team-auto-rate bold">50%</span>
+                        </div>
+                        <div class="team-bio">
+                            <span class="team-num bold">SQL</span>
+                            <span class="team-name">'&rpar;; DROP TABLE matches;--</span>
+                            <br>
+                            <span class="team-loc">Huntington, West Virginia</span>
+                        </div>
+                        <div class="rank-area">
+                            <div class="rank">4</div>
+                            <div class="wlt">(7-0-0)</div>
+                        </div>
+                    </div>
+                </span>
+                
+            </div>
+        </div>
+
+        <div id="vexu-teams" class="team-info-wrapper" style="display: none">
+            <div class="alliance red left">
+                <span class="team-area">
+                    <div class="team" id="vexu-red">
+                        <div class="rank-area">
+                            <div class="rank">4</div>
+                            <div class="wlt">(7-0-0)</div>
+                        </div>
+                        <div class="team-bio">
+                            <span class="team-num bold">SQL</span>
+                            <span class="team-name">Team'&rpar;; DROP TABLE matches;--</span>
+                            <br>
+                            <span class="team-loc">Huntington, West Virginia</span>
+                        </div>
+                    </div>
+                </span>
+            </div>
+
+            <div class="alliance blue right align-right">
+                <span class="team-area">
+                    <div class="team" id="vexu-blue">
+                        <div class="team-bio">
+                            <span class="team-num bold">FSU</span>
+                            <span class="team-name">Fairmont State University</span>
+                            <br>
+                            <span class="team-loc">Fairmont, West Virginia</span>
+                        </div>
+                        <div class="rank-area">
+                            <div class="rank">4</div>
+                            <div class="wlt">(7-0-0)</div>
+                        </div>
+                    </div>
+                </span>
+                
+            </div>
+        </div>
+
+        <div id="iq-teams" class="team-info-wrapper" style="display: none">
+            <div class="alliance blue left right">
+                <span class="team-area">
+                    <div class="team" id="iq-1">
+                        <div class="rank-area rank">10</div>
+                        <div class="team-bio">
+                            <span class="team-num bold">4K</span>
+                            <span class="team-name">Fork</span>
+                            <br>
+                            <span class="team-loc">Huntington, West Virginia</span>
+                        </div>
+                        <div class="team-stats">
+                            <span>Max Score</span>
+                            <span class="team-high bold">20%</span>
+                            <br>
+                            <span>Avg. Score</span>
+                            <span class="team-avg bold">15</span>
+                            <br>
+                            <span>D. Skills</span>
+                            <span class="team-skills bold">80</span>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="team" id="iq-2">
+                        <div class="rank-area rank">5</div>
+                        <div class="team-bio">
+                            <span class="team-num bold">99999Z</span>
+                            <span class="team-name">[Insert dad joke here]</span>
+                            <br>
+                            <span class="team-loc">Huntington, West Virginia</span>
+                        </div>
+                        <div class="team-stats">
+                            <span>Max Score</span>
+                            <span class="team-high bold">20%</span>
+                            <br>
+                            <span>Avg. Score</span>
+                            <span class="team-avg bold">15</span>
+                            <br>
+                            <span>D. Skills</span>
+                            <span class="team-skills bold">80</span>
+                        </div>
+                    </div>
+                </span>
+            </div>
+        </div>
+
+        <div id="vs-score" class="score-wrapper" style="display: none">
+            <span class="alliance red left score winner" id="red-score">100</span>
+            <span class="alliance blue right score" id="blue-score">98</span>
+        </div>
+
+        <div id="collab-score" class="score-wrapper">
+            <span class="score blue alliance left right">47</span>
+        </div>
+    </body>
+</html>
