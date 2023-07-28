@@ -110,6 +110,10 @@ async function main(){
         server.emit("match_time_updated", e);
     });
 
+    tm_scraper.onMatchSaved( m => {
+      server.emit("match_saved", m);
+    });
+
     // start the web server
     server.startServer(args.port);
 

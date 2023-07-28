@@ -52,7 +52,8 @@ module.exports = class TMScraper {
         this.onMatchQueueCallback = () => {}; // callback for when a match is queued
         this.onMatchStartedCallback = () => {}; // callback for when a match is started
         this.onTimeUpdatedCallback = () => {}; // callback for when the match time is updated (i.e., once per second during the match)
-   
+        this.onMatchSavedCallback = () => {}; // callback for when a match score is saved
+
         // initialize websocket connection
         this._connectWebsocket();
     }
@@ -225,7 +226,11 @@ module.exports = class TMScraper {
             return {
                 match_num: strip(cols[0].textContent),
                 team_1: strip(cols[1].textContent),
-                team_2: strip(cols[2].textContent)
+                team_2: strip(cols[2].textContent),
+                scoring: {
+                    is_scored: cols[3].textContent.trim() != "",
+                    score: Number(cols[3].textContent)
+                }
             }
         }
     }
@@ -737,14 +742,48 @@ module.exports = class TMScraper {
             return `Q${match.match}`;
         }
         else if (match.round in elim_rounds.keys()){
-            return `${elim_rounds[match.round]} ${match.isntance}-${match.round}`
+            return `${elim_rounds[match.round]} ${match.instance}-${match.round}`
         }
+        else if (match.round == 15) return `F ${match.match}` // IQ Finals
         else if (match.round == 0) return "NONE";
         else if (match.round == 1) return "P0";
         else if (match.round == 18) return "TO";
         else if (match.round == 17){
             // RIP to the name "Programming Skills", 2007 - 2023 :(
             return match.instance == 2 ? "D Skills" : "A Coding";
+        }
+        else return "OTHER";
+    }
+
+    /**
+     * Generates a match name as displayed in TM (e.g. "Qualification 123" or "Semifinal 1-1")
+     * @param {Object} match 
+     * @returns Long name of the match as displayed in TM
+     */
+    _buildLongMatchname(match){
+        const elim_rounds = {
+            3: "Quarterfinal",
+            4: "Semifinal",
+            5: "Final",
+            6: "Round of 16",
+            7: "Round of 32",
+            8: "Round of 64",
+            9: "Round of 128"
+        }
+        
+        if (match.round == 2) {
+            return `Qualification ${match.match}`;
+        }
+        else if (match.round in elim_rounds.keys()){
+            return `${elim_rounds[match.round]} ${match.instance}-${match.round}`
+        }
+        else if (match.round == 15) return `Finals ${match.match}` // IQ Finals
+        else if (match.round == 0) return "NONE";
+        else if (match.round == 1) return "P0";
+        else if (match.round == 18) return "TO";
+        else if (match.round == 17){
+            // RIP to the name "Programming Skills", 2007 - 2023 :(
+            return match.instance == 2 ? "Driving Skills" : "Autonomous Coding Skills";
         }
         else return "OTHER";
     }
@@ -782,6 +821,23 @@ module.exports = class TMScraper {
         else if (decoded.id == 13){ // field list
             this.fieldList = {0: "N/A", ...decoded.fields}
         }
+        else if (decoded.id == 9){ // ASSIGN_SAVED_MATCH
+            await this._fetchMatches();
+            await this._fetchRankings();
+            
+            let short_name = this._buildMatchName(decoded.match);
+            let long_name = this._buildLongMatchname(decoded.match);
+
+            let match = this.matches.find(m => strip(m.match_num) == short_name);
+            let match_info = {
+                long_name: long_name,
+                scoring: match.scoring,
+                ...(await this.getMatchTeams(match.match_num))
+            };
+
+            // console.log(match_info);
+            this.onMatchSavedCallback(match_info);
+        }
         
         // there are various other event types too, but for now we don't care about them
     }
@@ -802,6 +858,14 @@ module.exports = class TMScraper {
     async onMatchStarted(callback){
         this.onMatchStartedCallback = callback;
         // await this._connectWebsocket();
+    }
+
+    /**
+     * Sets the callback to be executed when a match score is saved.
+     * @param {function} callback - the callback to be executed
+     */
+    async onMatchSaved(callback){
+        this.onMatchSavedCallback = callback;
     }
 
     /**
