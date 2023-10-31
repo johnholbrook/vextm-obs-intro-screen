@@ -4,13 +4,14 @@
  * @author John Holbrook
  */
 
-const FormData = require('form-data');
+// const FormData = require('form-data');
 const util = require('util');
 const axios = require('axios');
 const jsdom = require('jsdom');
-const WebSocket = require('ws');
+// const WebSocket = require('ws');
 // const { match } = require('assert');
-const protobuf = require('protobufjs');
+// const protobuf = require('protobufjs');
+const { spawn } = require("child_process");
 
 /**
  * @class TMScraper
@@ -19,35 +20,34 @@ const protobuf = require('protobufjs');
 module.exports = class TMScraper {
     /**
      * TMScraper constructor
-     * @param {*} addr the address of the TM server
-     * @param {*} pw TM admin password
-     * @param {*} div name of the division (as used in the web interface URLs, e.g. "division1")
-     * @param {*} fs ID of the field set to connect to
+     * @param {string} addr TM server address
+     * @param {string} fs_name name of the field set to monitor
+     * @param {string} div name of the division (as used in the web interface URLs, e.g. "division1")
      * @param {boolean} omit Omit country from team name if there is also a state/province
+     * @param {boolean} show_field Show field name on intro display
      */
-    constructor(addr, pw, div, fs, omit, show_field){ 
+    constructor(addr, fs_name, div, omit, show_field){   
         this.addr = addr; // TM server address
-        this.pw = pw; // TM admin password
+        this.fs_name = fs_name; // name of the field set to monitor (e.g. "Match Field Set #1")
         this.division = div; // name of the division (as used in the web interface URLs, e.g. "division1")
-        this.fs = fs; // ID of the field set to connect to (starts at 1 and counts up from there)
         this.omit = omit ? true:false; // If true, strip country name from team location iff there's a state/province
         this.show_field = show_field ? true:false; // If true, send field name with match data
         
         this.program = null; // the program (e.g. "VRC", "VEXU", "VIQC")
-        this.cookie = null; // the session cookie
-        this.cookie_expiration = null; // the expiration time of the cookie
+        // this.cookie = null; // the session cookie
+        // this.cookie_expiration = null; // the expiration time of the cookie
         
         this.teams = []; // list of teams
         this.matches = []; // list of matches
         this.rankings = []; // list of rankings
         this.skills = []; // list of skills rankings
 
-        this.fieldList = null; // object mapping field IDs to field names
-        this.currentFieldId = 0; // Field ID for currently-queued match
+        // this.fieldList = null; // object mapping field IDs to field names
+        // this.currentFieldId = 0; // Field ID for currently-queued match
 
-        this.socket = null; // websocket connection to the TM server
-        this.pb = null; // protobuf schema used by TM server
-        this.fs_notice = null; // protobuf info for "Field Set Notice" message type
+        // this.socket = null; // websocket connection to the TM server
+        // this.pb = null; // protobuf schema used by TM server
+        // this.fs_notice = null; // protobuf info for "Field Set Notice" message type
 
         this.onMatchQueueCallback = () => {}; // callback for when a match is queued
         this.onMatchStartedCallback = () => {}; // callback for when a match is started
@@ -55,31 +55,81 @@ module.exports = class TMScraper {
         this.onMatchSavedCallback = () => {}; // callback for when a match score is saved
 
         // initialize websocket connection
-        this._connectWebsocket();
+        // this._connectWebsocket();
+        // this._authenticate()
+        
+        this.tm_monitor_process = null;
+        this._initializeMonitor();
+
+        this.match_on_field = "";
+        this.saved_match = "";
+        this.current_field_name = "";
+        this.match_running = false;
     }
 
     /**
-     * Authenticates with the TM server and gets the session cookie.
+     * Spawn the child process that monitors the TM field set window, and respond to alerts from that process as appropriate
      */
-    async _authenticate(){
-        console.log(`Authenticating with TM server at http://${this.addr}...`);
+    _initializeMonitor(){
+        // console.log("foo")
+        this.tm_monitor_process = spawn("./src/display/fs_monitor.exe", [this.fs_name]);
 
-        // send form data to server
-        let form = new FormData();
-        form.append('user', 'admin');
-        form.append('password', this.pw);
-        form.append('submit', '');
-        let submitForm = util.promisify((addr, callback) => form.submit(addr, callback));
-        let cookie_text = (await submitForm(`http://${this.addr}/admin/login`)).headers['set-cookie'][0];
+        this.tm_monitor_process.stdout.on('data', async b => {
+            let s = b.toString();
+            // console.log(b);
 
-        // extract the session cookie
-        let cookie_data = cookie_text.split(';')[0].split('"')[1];
-        this.cookie = `user="${cookie_data}"`;
+            s.split("\n").forEach(async line => {
+                let split = line.split(" :: ");
+                let type = split[0];
+                let data = split[1];
 
-        // extract the expiration time (cookie is good for 1 hour)
-        let cookie_expiration = cookie_text.split(';')[1].split('=')[1];
-        let expiration_date = new Date(cookie_expiration);
-        this.cookie_expiration = expiration_date;
+                if (type == "match_on_field"){ // match queued
+                    this.match_on_field = data;
+                    let match_info = await this.getMatchTeams(this.match_on_field);
+                    if (this.show_field) match_info.field_name = this.current_field_name;
+                    this.onMatchQueueCallback(match_info);
+                }
+
+                else if (type == "field_name"){ // field name changed
+                    this.current_field_name = data;
+                    let match_info = await this.getMatchTeams(this.match_on_field);
+                    if (this.show_field) match_info.field_name = this.current_field_name;
+                    this.onMatchQueueCallback(match_info);
+                }
+
+                else if (type == "field_state"){ // match started, stopped, or resumed
+                    if (data == "AUTONOMOUS" || data == "DRIVER CONTROL"){
+                        if (!this.match_running){
+                            this.onMatchStartedCallback();
+                            this.match_running = true;
+                        }
+                    }
+                    else if (data == "DISABLED"){
+                        this.match_running = false;
+                    }
+                }
+
+                else if (type == "saved_match"){
+                    await this._fetchMatches();
+                    await this._fetchRankings();
+
+                    let short_name = data;
+                    let long_name = short_name;
+
+                    let match = this.matches.find(m => strip(m.match_num) == short_name);
+                    let match_info = {
+                        long_name: long_name,
+                        scoring: match.scoring,
+                        ...(await this.getMatchTeams(match.match_num))
+                    };
+        
+                    // console.log(match_info);
+                    this.onMatchSavedCallback(match_info);
+                }
+            });
+
+            
+        });
     }
 
     /**
@@ -88,19 +138,10 @@ module.exports = class TMScraper {
      * @returns {string} the response from the server
      */
     async _makeRequest(page){
-        // if the cookie is missing or expired, authenticate
-        if(!this.cookie || this.cookie_expiration < new Date()){
-            await this._authenticate();
-        }
-
         // build the url and options
         let url = `http://${this.addr}/${page}`;
         // console.log(url);
-        let options = {
-            headers: {
-                Cookie: this.cookie,
-            }
-        };
+        let options = {};
 
         // make request
         let response = await axios.get(url, options);
@@ -631,218 +672,6 @@ module.exports = class TMScraper {
     }
 
     /**
-     * Establishes a websocket connection to the TM server.
-     */
-    async _connectWebsocket(){
-        // if the cookie is missing or expired, authenticate
-        if(!this.cookie || this.cookie_expiration < new Date()){
-            await this._authenticate();
-        }
-
-        // if the websocket is already open, do nothing
-        if (this.websocket){
-            return;
-            // this.websocket.close();
-            // this.websocket = null;
-        }
-
-        // open and parse the protobuf schema
-        this.pb = await protobuf.load("./src/display/fieldset.proto");
-        this.fs_notice = this.pb.lookupType("FieldSetNotice");
-
-        this.websocket = new WebSocket(`ws://${this.addr}/fieldsets/${this.fs}`, {
-            headers: {
-                Cookie: this.cookie
-            }
-        });
-
-        this.websocket.on('open', () => {
-            console.log('WebSocket connected');
-
-            // send handshake to TM
-            let hs = this._generateHandshake();
-            console.log("Initiating handshake...");
-            this._wsSend(hs); 
-        });
-
-        this.websocket.on('close', () => {
-            console.log('WebSocket disconnected');
-        });
-
-        this.websocket.on('message', async event => {
-            await this._handleEvent(event);
-        });
-    }
-
-    /**
-     * Send a message to the TM server via websockets
-     * @param {Buffer} data - data to send
-     */
-    async _wsSend(data){
-        await this._connectWebsocket();
-        this.websocket.send(data);
-    }
-
-    /**
-     * Generates the "handshake message" needed to send to TM.
-     * The message is 128 bytes long, namely:
-     * - 7 bytes of padding (content irrelevant)
-     * - Current UNIX timestamp in seconds since epoch (little-endian). Must be within 300s of TM server's time for handshake to be accepted.
-     * - 117 bytes of padding (content irrelevant)
-     * Yes, really. ¯\_(ツ)_/¯
-     */
-    _generateHandshake(){
-        let unixTime = (Math.floor(Date.now() / 1000)).toString(16); // unix timestamp in big-endian hex
-        
-        // create byte array
-        let hs = new Uint8Array(128);
-
-        // write time to byte array (little-endian)
-        hs[7]  = parseInt(unixTime.slice(6,8), 16);
-        hs[8]  = parseInt(unixTime.slice(4,6), 16);
-        hs[9]  = parseInt(unixTime.slice(2,4), 16);
-        hs[10] = parseInt(unixTime.slice(0,2), 16);
-        
-        return hs;
-    }
-
-    /**
-     * "Unmangles" a message recieved from the TM server into something decodable as a protobuf
-     */
-    _unmangle(raw_data){
-        let magic_number = raw_data[0] ^ 229;
-        // console.log("Magic number: ", magic_number);
-
-        let unmangled_data = Buffer.alloc(raw_data.length-1);
-        for (let i=1; i<raw_data.length; i++){
-            unmangled_data[i-1] = raw_data[i] ^ magic_number;
-        }
-
-        return unmangled_data;
-    }
-
-    /**
-     * Generates a match name as displayed in TM (e.g. "Q123" or "SF 1-1")
-     * from a V3MatchTuple object 
-     * @param {Object} match 
-     * @returns Name of the match as displayed in TM
-     */
-    _buildMatchName(match){
-        const elim_rounds = {
-            3: "QF",
-            4: "SF",
-            5: "F",
-            6: "R16",
-            7: "R32",
-            8: "R64",
-            9: "R128"
-        }
-        
-        if (match.round == 2) {
-            return `Q${match.match}`;
-        }
-        else if (match.round in elim_rounds.keys()){
-            return `${elim_rounds[match.round]} ${match.instance}-${match.round}`
-        }
-        else if (match.round == 15) return `F ${match.match}` // IQ Finals
-        else if (match.round == 0) return "NONE";
-        else if (match.round == 1) return "P0";
-        else if (match.round == 18) return "TO";
-        else if (match.round == 17){
-            // RIP to the name "Programming Skills", 2007 - 2023 :(
-            return match.instance == 2 ? "D Skills" : "A Coding";
-        }
-        else return "OTHER";
-    }
-
-    /**
-     * Generates a match name as displayed in TM (e.g. "Qualification 123" or "Semifinal 1-1")
-     * @param {Object} match 
-     * @returns Long name of the match as displayed in TM
-     */
-    _buildLongMatchname(match){
-        const elim_rounds = {
-            3: "Quarterfinal",
-            4: "Semifinal",
-            5: "Final",
-            6: "Round of 16",
-            7: "Round of 32",
-            8: "Round of 64",
-            9: "Round of 128"
-        }
-        
-        if (match.round == 2) {
-            return `Qualification ${match.match}`;
-        }
-        else if (match.round in elim_rounds.keys()){
-            return `${elim_rounds[match.round]} ${match.instance}-${match.round}`
-        }
-        else if (match.round == 15) return `Finals ${match.match}` // IQ Finals
-        else if (match.round == 0) return "NONE";
-        else if (match.round == 1) return "P0";
-        else if (match.round == 18) return "TO";
-        else if (match.round == 17){
-            // RIP to the name "Programming Skills", 2007 - 2023 :(
-            return match.instance == 2 ? "Driving Skills" : "Autonomous Coding Skills";
-        }
-        else return "OTHER";
-    }
-
-    /**
-     * Handles an event from the TM server (recieved via websockets).
-     */
-    async _handleEvent(event){
-        // console.log("Recieved: ", event);
-        let unmangled_event = this._unmangle(event);
-        let decoded = this.fs_notice.decode(unmangled_event);
-        
-        // console.log(decoded);
-
-        if (decoded.id == 8) { // ASSIGN_FIELD_MATCH – i.e. match queued
-            // update the current field ID
-            this.currentFieldId = decoded.fieldId ? decoded.fieldId : 0;
-
-            const ingore = [0, 1, 17, 18];
-            if (!ingore.includes(decoded.match.round)){
-                // `ignore` is a list of match types that the intro display should
-                // ignore (Practice, Skills, Timeout, etc.)
-                let match_name = this._buildMatchName(decoded.match);
-                let match_info = await this.getMatchTeams(match_name);
-                if (this.show_field) match_info.field_name = this.fieldList[this.currentFieldId];
-                this.onMatchQueueCallback(match_info);
-            }
-        }
-        else if (decoded.id == 1){ // MATCH_STARTED
-            this.onMatchStartedCallback();
-        }
-        else if (decoded.id == 8){ // TIME_UPDATED
-            this.onMatchQueueCallback();
-        }
-        else if (decoded.id == 13){ // field list
-            this.fieldList = {0: "N/A", ...decoded.fields}
-        }
-        else if (decoded.id == 9){ // ASSIGN_SAVED_MATCH
-            await this._fetchMatches();
-            await this._fetchRankings();
-            
-            let short_name = this._buildMatchName(decoded.match);
-            let long_name = this._buildLongMatchname(decoded.match);
-
-            let match = this.matches.find(m => strip(m.match_num) == short_name);
-            let match_info = {
-                long_name: long_name,
-                scoring: match.scoring,
-                ...(await this.getMatchTeams(match.match_num))
-            };
-
-            // console.log(match_info);
-            this.onMatchSavedCallback(match_info);
-        }
-        
-        // there are various other event types too, but for now we don't care about them
-    }
-
-    /**
      * Sets the callback to be executed when a match is queued.
      * @param {function} callback - the callback to be executed
      */
@@ -876,7 +705,7 @@ module.exports = class TMScraper {
     async onMatchTimeUpdated(callback){
         this.onTimeUpdatedCallback = callback;
         // await this._connectWebsocket();
-    }
+    } 
 
     /**
      * Gets info about the teams in a particular match.
@@ -888,7 +717,7 @@ module.exports = class TMScraper {
             await this._fetchTeams();
         }
         if (this.matches.length == 0){
-            await this._fetchMatches();
+            await this._fetchMatches(); 
         }
 
         // pull new ranking & skills data
@@ -918,7 +747,7 @@ module.exports = class TMScraper {
 
             if (!match.red_2 && !match.blue_2){
                 // special case for WVSSAC Robotics events where eliminations are 1v1
-                // https://www.wvroboticsalliance.org/programs/wvssac-robotics/rules
+                // https://www.wvrobot.org/programs/wvssac-robotics/rules
                 return await {
                     match_num: match_num,
                     program: this.program,

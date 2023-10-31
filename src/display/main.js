@@ -11,12 +11,13 @@ const args = yargs.command("tm-stream-widgets", "Serve additional TM displays as
                     alias: 'a',  
                     description: "VEX TM Server Address",
                     type: "string",
-                    default: "localhost"
+                    default: "127.0.0.1"
                   })
-                  .option('password', {
-                    alias: 'p',
-                    description: "VEX TM Admin Password",
-                    type: "string"
+                  .option('fs-name', {
+                    alias: 'f',
+                    description: "Name of the field set to monitor",
+                    type: "string",
+                    default: "Match Field Set #1"
                   })
                   .option('show-predictions', {
                     alias: ['g', 'predict'],
@@ -34,12 +35,6 @@ const args = yargs.command("tm-stream-widgets", "Serve additional TM displays as
                     description: "Division name (as used in TM web interface URLs - only set this option at multi-division events)",
                     type: "string",
                     default: "division1"
-                  })
-                  .option("field-set", {
-                    alias: "f",
-                    description: "ID of the field set to connect to (only set if you have multiple field sets)",
-                    type: "number",
-                    default: 1
                   })
                   .option("omit-country", {
                     alias: "o",
@@ -72,13 +67,13 @@ const args = yargs.command("tm-stream-widgets", "Serve additional TM displays as
 
 
 async function main(){
-    if (!args.password){
-        console.error("Must specify TM admin password");
-        exit();
-    }
+    // if (!args.password){
+    //     console.error("Must specify TM admin password");
+    //     exit();
+    // }
 
     // create the TM scraper
-    let tm_scraper = new TMScraper(args.address, args.password, args['division-name'], args['field-set'], args['omit-country'], args['show-field-name']);
+    let tm_scraper = new TMScraper(args.address, args['fs-name'], args['division-name'], args['omit-country'], args['show-field-name']);
 
     // start fetching team stats, if applicable
     let team_stats = null;
