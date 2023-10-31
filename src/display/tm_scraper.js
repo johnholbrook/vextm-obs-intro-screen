@@ -71,12 +71,14 @@ module.exports = class TMScraper {
      * Spawn the child process that monitors the TM field set window, and respond to alerts from that process as appropriate
      */
     _initializeMonitor(){
-        // console.log("foo")
         this.tm_monitor_process = spawn("./src/display/fs_monitor.exe", [this.fs_name]);
+
+        this.tm_monitor_process.stderr.on('data', b => {
+            console.log("ERROR:", b.toString());
+        });
 
         this.tm_monitor_process.stdout.on('data', async b => {
             let s = b.toString();
-            // console.log(b);
 
             s.split("\n").forEach(async line => {
                 let split = line.split(" :: ");
@@ -110,25 +112,23 @@ module.exports = class TMScraper {
                 }
 
                 else if (type == "saved_match"){
+                    await delay(1000); //TM is suuuper slow to recalculate rankings after a score is saved ¯\_(ツ)_/¯
                     await this._fetchMatches();
                     await this._fetchRankings();
 
                     let short_name = data;
-                    let long_name = short_name;
+                    let long_name = this.buildLongMatchName(short_name);
 
-                    let match = this.matches.find(m => strip(m.match_num) == short_name);
+                    let match = this.matches.find(m => strip(m.match_num) == strip(short_name));
                     let match_info = {
                         long_name: long_name,
                         scoring: match.scoring,
                         ...(await this.getMatchTeams(match.match_num))
                     };
         
-                    // console.log(match_info);
                     this.onMatchSavedCallback(match_info);
                 }
             });
-
-            
         });
     }
 
@@ -245,7 +245,11 @@ module.exports = class TMScraper {
                     red_1: strip(cols[1].textContent),
                     red_2: null,
                     blue_1: strip(cols[2].textContent),
-                    blue_2: null
+                    blue_2: null,
+                    scoring: {
+                        red_score: strip(cols[3].textContent),
+                        blue_score: strip(cols[4].textContent)
+                    }
                 }
             }
             else return {
@@ -253,14 +257,22 @@ module.exports = class TMScraper {
                 red_1: strip(cols[1].textContent),
                 red_2: strip(cols[2].textContent),
                 blue_1: strip(cols[3].textContent),
-                blue_2: strip(cols[4].textContent)
+                blue_2: strip(cols[4].textContent),
+                scoring: {
+                    red_score: strip(cols[5].textContent),
+                    blue_score: strip(cols[6].textContent)
+                }
             }
         }
         else if (this.program == "VEXU"){
             return {
                 match_num: cols[0].textContent,
                 red_1: strip(cols[1].textContent),
-                blue_1: strip(cols[2].textContent)
+                blue_1: strip(cols[2].textContent),
+                scoring: {
+                    red_score: strip(cols[3].textContent),
+                    blue_score: strip(cols[4].textContent)
+                }
             }
         }
         else if (this.program == "VIQC"){
@@ -285,7 +297,7 @@ module.exports = class TMScraper {
         if (force_refresh || this.matches.length == 0){
             await this._fetchMatches();
         }
-
+        // console.log(this.matches);
         return this.matches;
     }
 
@@ -672,6 +684,19 @@ module.exports = class TMScraper {
     }
 
     /**
+     * Given the abbreviated name of a match, returns the "long name" used on the results screen (e.g. "Qualification 1", "Quarterfinal 3-1")
+     * @param {string} short_name "short name" of the match (e.g. "Q1", "QF 3-1", etc.)
+     */
+    buildLongMatchName(short_name){
+        if (short_name.slice(0,2) == "QF") return short_name.replace("QF", "Quarterfinal");
+        else return short_name.replace("Q", "Qualification ")
+                         .replace("R16", "Round of 16")
+                         .replace("SF", "Semifinal")
+                         .replace("F", "Final")
+                         .replace("R32", "Round of 32");
+    }
+
+    /**
      * Sets the callback to be executed when a match is queued.
      * @param {function} callback - the callback to be executed
      */
@@ -835,4 +860,13 @@ function arrayAvg(array){
         sum += n;
     });
     return sum/array.length;
+}
+
+/**
+ * Returns a promise that evaluates after the specified time
+ * @param {Number} time time to delay in ms 
+ * @returns Promise
+ */
+function delay(time){
+    return new Promise(res => setTimeout(res, time));
 }

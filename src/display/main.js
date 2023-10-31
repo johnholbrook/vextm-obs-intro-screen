@@ -44,7 +44,7 @@ const args = yargs.command("tm-stream-widgets", "Serve additional TM displays as
                   })
                   .option("show-stats", {
                     alias: "s",
-                    description: "Show additional scouting stats",
+                    description: "Show additional scouting stats (VRC only)",
                     type: "boolean",
                     default: false
                   })
