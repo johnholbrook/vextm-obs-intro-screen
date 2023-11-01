@@ -96,8 +96,9 @@ body{
 
 .team-area{
     flex: 1 0 auto;
-    width: 100%;
+    /* width: 100%; */
     padding-bottom: 1rem;
+    margin: 0.5rem;
 }
 
 #vexu-teams{
@@ -182,4 +183,20 @@ body{
 .winner{
     /* border: 0.25rem groove yellow; */
     text-decoration: underline;
+}
+
+.seed-area{
+    /* width: 4rem; */
+    max-width: 5rem;
+    flex: 1 0 auto;
+    font-size: 1rem;
+    text-align: center;
+    margin-top: auto;
+    margin-bottom: auto;
+    padding: 0;
+}
+.seed{
+    font-size: 4rem;
+    font-weight: bold;
+    margin:0;
 }

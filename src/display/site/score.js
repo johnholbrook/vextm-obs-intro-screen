@@ -111,6 +111,29 @@ function populate_vrc_score(match){
     document.querySelector("#vrc-blue2 .team-wp").innerHTML = match.blue_2.wp;
     document.querySelector("#vrc-blue2 .team-awp").innerHTML = match.blue_2.awp;
     document.querySelector("#vrc-blue2 .team-auto-rate").innerHTML = match.blue_2.auto_win_rate; 
+
+    if (match.red_1.seed){
+        // this is an elimination match' show alliance seeds rather than team ranks
+        document.querySelector("#vrc-red1 .rank-area").style.display = "none";
+        document.querySelector("#vrc-red2 .rank-area").style.display = "none";
+        document.querySelector("#vrc-blue1 .rank-area").style.display = "none";
+        document.querySelector("#vrc-blue2 .rank-area").style.display = "none";
+
+        document.querySelector("#vrc-red-seed-area").style.display = "";
+        document.querySelector("#vrc-blue-seed-area").style.display = "";
+
+        document.querySelector("#vrc-red-seed").innerHTML = match.red_1.seed;
+        document.querySelector("#vrc-blue-seed").innerHTML = match.blue_1.seed;
+    }
+    else{
+        document.querySelector("#vrc-red1 .rank-area").style.display = "";
+        document.querySelector("#vrc-red2 .rank-area").style.display = "";
+        document.querySelector("#vrc-blue1 .rank-area").style.display = "";
+        document.querySelector("#vrc-blue2 .rank-area").style.display = "";
+
+        document.querySelector("#vrc-red-seed-area").style.display = "none";
+        document.querySelector("#vrc-blue-seed-area").style.display = "none";
+    }
 }
 
 function populate_vexu_score(match){
@@ -137,5 +160,24 @@ function populate_vexu_score(match){
     document.querySelector("#vexu-blue .team-loc").innerHTML = match.blue_1.location;
     document.querySelector("#vexu-blue .team-wp").innerHTML = match.blue_1.wp;
     document.querySelector("#vexu-blue .team-awp").innerHTML = match.blue_1.awp;
-    document.querySelector("#vexu-blue .team-auto-rate").innerHTML = match.blue_1.auto_win_rate; 
+    document.querySelector("#vexu-blue .team-auto-rate").innerHTML = match.blue_1.auto_win_rate;
+
+    if (match.red_1.seed){
+        // this is an elimination match' show alliance seeds rather than team ranks
+        document.querySelector("#vexu-red .rank-area").style.display = "none";
+        document.querySelector("#vexu-blue .rank-area").style.display = "none";
+        
+        document.querySelector("#vexu-red-seed-area").style.display = "";
+        document.querySelector("#vexu-blue-seed-area").style.display = "";
+
+        document.querySelector("#vexu-red-seed").innerHTML = match.red_1.seed;
+        document.querySelector("#vexu-blue-seed").innerHTML = match.blue_1.seed;
+    }
+    else{
+        document.querySelector("#vexu-red .rank-area").style.display = "";
+        document.querySelector("#vexu-blue .rank-area").style.display = "";
+
+        document.querySelector("#vexu-red-seed-area").style.display = "none";
+        document.querySelector("#vexu-blue-seed-area").style.display = "none";
+    }
 }
