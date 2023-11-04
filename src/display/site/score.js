@@ -12,6 +12,9 @@ socket.on("match_saved", data => {
         case "VEXU":
             populate_vexu_score(data);
             break;
+        case "RADC":
+            populate_radc_score(data);
+            break;
     }
 });
 
@@ -21,14 +24,19 @@ function show_program(program){
             document.querySelector("#vrc-teams").style.display = "none";
             document.querySelector("#vexu-teams").style.display = "none";
             document.querySelector("#iq-teams").style.display = "";
+            document.querySelector("#radc-teams").style.display = "none";
 
             document.querySelector("#vs-score").style.display = "none";
             document.querySelector("#collab-score").style.display = "";
+
+            document.querySelector("#collab-score-value").classList.add("blue");
+            document.querySelector("#collab-score-value").classList.remove("grey");
             break;
         case "VRC":
             document.querySelector("#vrc-teams").style.display = "";
             document.querySelector("#vexu-teams").style.display = "none";
             document.querySelector("#iq-teams").style.display = "none";
+            document.querySelector("#radc-teams").style.display = "none";
 
             document.querySelector("#vs-score").style.display = "";
             document.querySelector("#collab-score").style.display = "none";
@@ -37,10 +45,22 @@ function show_program(program){
             document.querySelector("#vrc-teams").style.display = "none";
             document.querySelector("#vexu-teams").style.display = "";
             document.querySelector("#iq-teams").style.display = "none";
+            document.querySelector("#radc-teams").style.display = "none";
 
             document.querySelector("#vs-score").style.display = "";
             document.querySelector("#collab-score").style.display = "none";
             break;
+        case "RADC":
+            document.querySelector("#vrc-teams").style.display = "none";
+            document.querySelector("#vexu-teams").style.display = "none";
+            document.querySelector("#iq-teams").style.display = "none";
+            document.querySelector("#radc-teams").style.display = "";
+
+            document.querySelector("#vs-score").style.display = "none";
+            document.querySelector("#collab-score").style.display = "";
+
+            document.querySelector("#collab-score-value").classList.remove("blue");
+            document.querySelector("#collab-score-value").classList.add("grey");
     }
 }
 
@@ -66,6 +86,16 @@ function populate_iq_score(match){
     document.querySelector("#iq-2 .team-high").innerHTML = match.team_2.high_score;
     document.querySelector("#iq-2 .team-avg").innerHTML = match.team_2.avg_score;
     document.querySelector("#iq-2 .team-skills").innerHTML = match.team_2.high_driving ? match.team_2.high_driving : 0;
+
+    // hide teams ranks for finals matches
+    if (match.match_num[0] == "F"){
+        document.querySelector("#iq-1 .rank-area").style.display = "none";
+        document.querySelector("#iq-2 .rank-area").style.display = "none";
+    }
+    else{
+        document.querySelector("#iq-1 .rank-area").style.display = "";
+        document.querySelector("#iq-2 .rank-area").style.display = "";
+    }
 }
 
 function populate_vrc_score(match){
@@ -113,7 +143,7 @@ function populate_vrc_score(match){
     document.querySelector("#vrc-blue2 .team-auto-rate").innerHTML = match.blue_2.auto_win_rate; 
 
     if (match.red_1.seed){
-        // this is an elimination match' show alliance seeds rather than team ranks
+        // this is an elimination match show alliance seeds rather than team ranks
         document.querySelector("#vrc-red1 .rank-area").style.display = "none";
         document.querySelector("#vrc-red2 .rank-area").style.display = "none";
         document.querySelector("#vrc-blue1 .rank-area").style.display = "none";
@@ -179,5 +209,37 @@ function populate_vexu_score(match){
 
         document.querySelector("#vexu-red-seed-area").style.display = "none";
         document.querySelector("#vexu-blue-seed-area").style.display = "none";
+    }
+}
+
+function populate_radc_score(match){
+    show_program("RADC");
+
+    document.querySelector("#match-name").innerHTML = match.long_name;
+
+    document.querySelector("#collab-score-value").innerHTML = match.scoring.score;
+
+    document.querySelector("#radc-red .rank").innerHTML = match.red.rank;
+    document.querySelector("#radc-red .team-num").innerHTML = match.red.number;
+    document.querySelector("#radc-red .team-name").innerHTML = match.red.name;
+    document.querySelector("#radc-red .team-loc").innerHTML = match.red.location;
+    document.querySelector("#radc-red .team-max").innerHTML = match.red.high_score;
+    document.querySelector("#radc-red .team-avg").innerHTML = match.red.avg_score;
+
+    document.querySelector("#radc-blue .rank").innerHTML = match.blue.rank;
+    document.querySelector("#radc-blue .team-num").innerHTML = match.blue.number;
+    document.querySelector("#radc-blue .team-name").innerHTML = match.blue.name;
+    document.querySelector("#radc-blue .team-loc").innerHTML = match.blue.location;
+    document.querySelector("#radc-blue .team-max").innerHTML = match.blue.high_score;
+    document.querySelector("#radc-blue .team-avg").innerHTML = match.blue.avg_score;
+
+    // hide teams ranks for elim matches
+    if (match.match_num[0] == "S" || match.match_num[0] == "F" || match.match_num.slice(0, 2) == "QF"){
+        document.querySelector("#radc-red .rank-area").style.display = "none";
+        document.querySelector("#radc-blue .rank-area").style.display = "none";
+    }
+    else{
+        document.querySelector("#radc-red .rank-area").style.display = "";
+        document.querySelector("#radc-blue .rank-area").style.display = "";
     }
 }

@@ -340,8 +340,8 @@ module.exports = class TMScraper {
             // console.log(high_and_avg_scores);
             rankings_list.forEach(r => {
                 let tmp = high_and_avg_scores.find(e => e.number == r.number);
-                r.high_score = tmp.high_score.toFixed(1);
-                r.avg_score = tmp.avg_score.toFixed(1);
+                r.high_score = tmp.high_score.toFixed(0);
+                r.avg_score = tmp.avg_score.toFixed(0);
             });
         }
 
