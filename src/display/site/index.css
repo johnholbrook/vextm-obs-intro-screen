@@ -150,6 +150,7 @@ hr.team-separator{
 .team-stats{
     /* width: 30%; */
     font-size: 1.5rem;
+    margin: auto 0;
 }
 .left .team-stats{
     text-align: right;

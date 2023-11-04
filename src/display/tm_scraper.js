@@ -100,7 +100,7 @@ module.exports = class TMScraper {
                 }
 
                 else if (type == "field_state"){ // match started, stopped, or resumed
-                    if (data == "AUTONOMOUS" || data == "DRIVER CONTROL"){
+                    if (data == "AUTONOMOUS" || data == "DRIVER CONTROL" || data == "PILOT CONTROL"){
                         if (!this.match_running){
                             this.onMatchStartedCallback();
                             this.match_running = true;
@@ -234,7 +234,7 @@ module.exports = class TMScraper {
      */
     _extractMatchData(row){
         let cols = row.querySelectorAll('td');
-        if (this.program == "VRC" || this.program == "RADC"){
+        if (this.program == "VRC"){
             if (cols.length == 5){
                 // this is a special case for WVSSAC Robotics, where qualification
                 // matches are 2v2 but eliminations are 1v1. Therefore you have a VRC
@@ -280,6 +280,17 @@ module.exports = class TMScraper {
                 match_num: strip(cols[0].textContent),
                 team_1: strip(cols[1].textContent),
                 team_2: strip(cols[2].textContent),
+                scoring: {
+                    is_scored: cols[3].textContent.trim() != "",
+                    score: Number(cols[3].textContent)
+                }
+            }
+        }
+        else if (this.program == "RADC"){
+            return {
+                match_num: strip(cols[0].textContent),
+                red: strip(cols[1].textContent),
+                blue: strip(cols[2].textContent),
                 scoring: {
                     is_scored: cols[3].textContent.trim() != "",
                     score: Number(cols[3].textContent)
@@ -390,11 +401,15 @@ module.exports = class TMScraper {
             let cols = row.querySelectorAll('td');
 
             // assume that if both alliances' scores are 0, the match just hasn't been scored yet
-            if (strip(cols[5].textContent) != "0" || strip(cols[6].textContent) != "0"){
-                team_scores[cols[1].textContent].push(Number(cols[5].textContent))
-                team_scores[cols[2].textContent].push(Number(cols[5].textContent))
-                team_scores[cols[3].textContent].push(Number(cols[6].textContent))
-                team_scores[cols[4].textContent].push(Number(cols[6].textContent))
+            // if (strip(cols[5].textContent) != "0" || strip(cols[6].textContent) != "0"){
+            //     team_scores[cols[1].textContent].push(Number(cols[5].textContent))
+            //     team_scores[cols[2].textContent].push(Number(cols[5].textContent))
+            //     team_scores[cols[3].textContent].push(Number(cols[6].textContent))
+            //     team_scores[cols[4].textContent].push(Number(cols[6].textContent))
+            // }
+            if (cols[3].textContent.trim() != ""){
+                team_scores[cols[1].textContent].push(Number(cols[3].textContent));
+                team_scores[cols[2].textContent].push(Number(cols[3].textContent));
             }
         });
 
@@ -477,13 +492,26 @@ module.exports = class TMScraper {
             }
         }
         else if (this.program == "RADC"){
-            return [{
+            if (cols[1].textContent.indexOf(",") > -1){
+                // if the entry in the "team number" column contains a comma,
+                // these are elim rankings and each row is used for 2 teams
+                return [
+                    {
+                        rank: cols[0].textContent,
+                        number: cols[1].textContent.split(", ")[0],
+                        name: cols[2].textContent.split(", ")[0], // hope the team name doesn't have a comma :P
+                    },
+                    {
+                        rank: cols[0].textContent,
+                        number: cols[1].textContent.split(", ")[1],
+                        name: cols[2].textContent.split(", ")[1], // hope the team name doesn't have a comma :P
+                    }
+                ]
+            }
+            else return [{
                 rank: cols[0].textContent,
                 number: cols[1].textContent,
                 name: cols[2].textContent,
-                wp: cols[3].textContent,
-                sp: cols[4].textContent,
-                wlt: cols[5].textContent
             }]
         }
     }
@@ -654,20 +682,21 @@ module.exports = class TMScraper {
         let rankings_page_data = await this._makeRequest(`${this.division}/rankings`);
         let rankings_page = new jsdom.JSDOM(rankings_page_data).window.document;
         let raknings_row = rankings_page.querySelector('table.table-striped > tbody > tr').querySelectorAll('td');
+        // console.log(matches_row.length, raknings_row.length);
 
         if (matches_row.length == 4){
-            this.program = "VIQC";
+            if (raknings_row.length == 6){
+                this.program = "RADC";
+            }
+            else{
+                this.program = "VIQC";
+            }
         }
         else if (matches_row.length == 5){
             this.program = "VEXU";
         }
         else if (matches_row.length == 7){
-            if (raknings_row.length == 6){
-                this.program = "RADC";
-            }
-            else{
-                this.program = "VRC";
-            }
+            this.program = "VRC";
         }
     }
 
@@ -765,7 +794,7 @@ module.exports = class TMScraper {
 
         // console.log(match);
 
-        if (this.program == "VRC" || this.program == "RADC" || this.program == "VEXU"){
+        if (this.program == "VRC" || this.program == "VEXU"){
             // if this is an elimination match, get bracket seedings
             const qp_re = new RegExp('[QP][1-9]'); // regex to match practice or qualification match numbers
             let seeds = qp_re.test(match_num) ? null : await this._calculateElimSeeds();
@@ -802,9 +831,17 @@ module.exports = class TMScraper {
         else if (this.program == "VIQC"){
             return await {
                 match_num: match_num,
-                program: "VIQC",
+                program: this.program,
                 team_1: await this._getTeamData(match.team_1),
                 team_2: await this._getTeamData(match.team_2)
+            }
+        }
+        else if (this.program == "RADC"){
+            return await {
+                match_num: match_num,
+                program: this.program,
+                red: await this._getTeamData(match.red),
+                blue: await this._getTeamData(match.blue)
             }
         }
     }

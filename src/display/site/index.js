@@ -86,26 +86,23 @@ function showVRCTeamInfo(teamid, info, show_stats){
  * @param {String} teamid - "red1", "red2", "blue1", or "blue2"
  * @param {Object} info - object with team info
  */
-function showRADCTeamInfo(teamid, info, show_stats){
+function showRADCTeamInfo(teamid, info, show_stats, match_num){
     // show the team number/name/location
     document.querySelector(`#radc-${teamid} .team-num`).innerHTML = info.number;
     document.querySelector(`#radc-${teamid} .team-name`).innerHTML = info.name;
     document.querySelector(`#radc-${teamid} .team-loc`).innerHTML = info.location;
 
     // show team ranking
-    document.querySelector(`#radc-${teamid} .team-rank`).innerHTML = info.rank;
-    document.querySelector(`#radc-${teamid} .team-rank-area .team-wlt`).innerHTML = `(${info.wlt})`;
+    // document.querySelector(`#radc-${teamid} .team-rank`).innerHTML = info.rank;
 
-    // if this is an elimination match, show the seed for the whole alliance rather than the rank for this team
-    let color = teamid.slice(0, teamid.length-1);
-    if (info.seed){
+    // hide team ranking for finals matches
+    if (match_num[0] == "S" || match_num[0] == "F" || match_num.slice(0, 2) == "QF"){
         document.querySelector(`#radc-${teamid} .team-rank-area`).style.display = "none";
-        document.querySelector(`#radc-${color}-seed-area`).style.display = "";
-        document.querySelector(`#radc-${color}-seed`).innerHTML = info.seed;
     }
     else{
+        // show and populate team rank area
         document.querySelector(`#radc-${teamid} .team-rank-area`).style.display = "";
-        document.querySelector(`#radc-${color}-seed-area`).style.display = "none";
+        document.querySelector(`#radc-${teamid} .team-rank`).innerHTML = info.rank;
     }
 
     if (show_stats){
@@ -113,7 +110,6 @@ function showRADCTeamInfo(teamid, info, show_stats){
         document.querySelector(`#radc-${teamid} .team-stats`).style.display = "";
         document.querySelector(`#radc-${teamid} .team-bio`).style.width = "";
 
-        document.querySelector(`#radc-${teamid} .team-wp`).innerHTML = info.wp;
         document.querySelector(`#radc-${teamid} .team-max`).innerHTML = info.high_score;
         document.querySelector(`#radc-${teamid} .team-avg`).innerHTML = info.avg_score;
     }
@@ -169,7 +165,7 @@ function showVIQCTeamInfo(teamid, info, show_stats, match_num){
  * @param {*} info - object with team info
  */
 function showVEXUTeamInfo(teamid, info, show_stats){
-    console.log(teamid);
+    // console.log(teamid);
     // show the team number/name/location
     document.querySelector(`#vexu-${teamid} .team-num`).innerHTML = info.number;
     document.querySelector(`#vexu-${teamid} .team-name`).innerHTML = info.name;
@@ -240,10 +236,8 @@ function showIntro(match) {
         }
     }
     else if (match.program == "RADC"){
-        showRADCTeamInfo("red1", match.red_1, match.show_stats);
-        showRADCTeamInfo("red2", match.red_2, match.show_stats);
-        showRADCTeamInfo("blue1", match.blue_1, match.show_stats);
-        showRADCTeamInfo("blue2", match.blue_2, match.show_stats);
+        showRADCTeamInfo("red", match.red, match.show_stats, match.match_num);
+        showRADCTeamInfo("blue", match.blue, match.show_stats, match.match_num);
     }
     else if (match.program == "VEXU"){
         showVEXUTeamInfo("red", match.red_1, match.show_stats);
