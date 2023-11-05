@@ -39,19 +39,35 @@ serverAddrInput.setText("localhost");
 serverAddrRowLayout.addWidget(serverAddrInput);
 
 // TM password row
-const passRow = new QWidget();
-const passRowLayout = new FlexLayout();
-passRow.setObjectName("passRow");
-passRow.setLayout(passRowLayout);
+// const passRow = new QWidget();
+// const passRowLayout = new FlexLayout();
+// passRow.setObjectName("passRow");
+// passRow.setLayout(passRowLayout);
 
-const passLabel = new QLabel();
-passLabel.setText("TM Admin Password:");
-passLabel.setObjectName("passLabel");
-passRowLayout.addWidget(passLabel);
+// const passLabel = new QLabel();
+// passLabel.setText("TM Admin Password:");
+// passLabel.setObjectName("passLabel");
+// passRowLayout.addWidget(passLabel);
 
-const passInput = new QLineEdit();
-passInput.setObjectName("passInput");
-passRowLayout.addWidget(passInput);
+// const passInput = new QLineEdit();
+// passInput.setObjectName("passInput");
+// passRowLayout.addWidget(passInput);
+
+// Field set name row
+const fsNameRow = new QWidget();
+const fsNameRowLayout = new FlexLayout();
+fsNameRow.setObjectName("fsNameRow");
+fsNameRow.setLayout(fsNameRowLayout);
+
+const fsNameLabel = new QLabel();
+fsNameLabel.setText("Field Set Name:");
+fsNameLabel.setObjectName("fsNameLabel");
+fsNameRowLayout.addWidget(fsNameLabel);
+
+const fsNameInput = new QLineEdit();
+fsNameInput.setObjectName("fsNameInput");
+fsNameInput.setText("Match Field Set #1");
+fsNameRowLayout.addWidget(fsNameInput);
 
 // server port row
 const portRow = new QWidget();
@@ -141,10 +157,11 @@ startButton.setObjectName("startButton");
 
 // Add the widgets to their respective layouts
 optionsAreaLayout.addWidget(serverAddrRow);
-optionsAreaLayout.addWidget(passRow);
+// optionsAreaLayout.addWidget(passRow);
+optionsAreaLayout.addWidget(fsNameRow);
 optionsAreaLayout.addWidget(portRow);
 optionsAreaLayout.addWidget(divisionRow);
-optionsAreaLayout.addWidget(fieldSetRow);
+// optionsAreaLayout.addWidget(fieldSetRow);
 optionsAreaLayout.addWidget(predictMatchCheckbox);
 // optionsAreaLayout.addWidget(playSoundsCheckbox);
 optionsAreaLayout.addWidget(omitCountryCheckbox);
@@ -171,7 +188,8 @@ var display_process = null;
 // start the display process
 function startProcess(){
     const address = serverAddrInput.text();
-    const password = passInput.text();
+    // const password = passInput.text();
+    const fsName = fsNameInput.text();
     const port = portInput.text();
     const division = divisionInput.text();
     const fieldSet = fieldSetInput.text();
@@ -185,10 +203,11 @@ function startProcess(){
 
     display_process = spawn(display_exec_name, [
         "-a", address, 
-        "-p", password,
+        // "-p", password,
+        "-f", fsName,
         "--port", port,
         "-d", division,
-        "-f", fieldSet, 
+        // "-f", fieldSet, 
         ...(predict ? ["-g"] : []),
         ...(omitCountry ? ["-o"] : []),
         ...(showStats ? ["-s"] : []),
@@ -220,7 +239,8 @@ function stopProcess(){
 // grey out all the input areas so they can't be modified while the display is running
 function disableInputs(){
     serverAddrInput.setEnabled(false);
-    passInput.setEnabled(false);
+    // passInput.setEnabled(false);
+    fsNameInput.setEnabled(false);
     portInput.setEnabled(false);
     divisionInput.setEnabled(false);
     fieldSetInput.setEnabled(false);
@@ -234,7 +254,8 @@ function disableInputs(){
 // re-enable all the inputs
 function enableInputs(){
     serverAddrInput.setEnabled(true);
-    passInput.setEnabled(true);
+    // passInput.setEnabled(true);
+    fsNameInput.setEnabled(true);
     portInput.setEnabled(true);
     divisionInput.setEnabled(true);
     fieldSetInput.setEnabled(true);
@@ -270,12 +291,12 @@ const rootStyleSheet = `
         margin-bottom: 4px;
     }
 
-    #serverAddrRow, #passRow, #portRow, #divisionRow, #fieldSetRow{
+    #serverAddrRow, #passRow, #portRow, #divisionRow, #fieldSetRow, #fsNameRow{
         flex-direction: row;
         margin: 5px;
     }
 
-    #serverAddrLabel, #passLabel, #portLabel, #divisionLabel, #fieldSetLabel{
+    #serverAddrLabel, #passLabel, #portLabel, #divisionLabel, #fieldSetLabel, #fsNameLabel{
         margin-right: 0.5em;
     }
 

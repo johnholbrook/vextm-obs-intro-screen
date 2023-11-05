@@ -79,6 +79,7 @@ module.exports = class TMScraper {
 
         this.tm_monitor_process.stdout.on('data', async b => {
             let s = b.toString();
+            // console.log(s);
 
             s.split("\n").forEach(async line => {
                 let split = line.split(" :: ");
