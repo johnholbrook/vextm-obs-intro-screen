@@ -3,7 +3,7 @@ const path = require("path");
 
 async function main(){
     await rcedit(
-        path.join(".", "deploy", "win32", "build", "VexTMIntro", "VEX TM Intro Screen.exe"), 
+        path.join(".", "deploy", "win32", "build", "VexTMIntro", "TM Stream Widgets.exe"), 
         {
             icon: path.join(".", "icon", "icon.ico")
         }
