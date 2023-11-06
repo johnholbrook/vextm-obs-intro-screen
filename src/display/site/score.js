@@ -112,7 +112,7 @@ function populate_vrc_score(match){
     document.querySelector("#vrc-red1 .team-name").innerHTML = match.red_1.name;
     document.querySelector("#vrc-red1 .team-loc").innerHTML = match.red_1.location;
     document.querySelector("#vrc-red1 .team-wp").innerHTML = match.red_1.wp;
-    document.querySelector("#vrc-red1 .team-awp").innerHTML = match.red_1.awp;
+    document.querySelector("#vrc-red1 .team-awp").innerHTML = match.red_1.awp_rate;
     document.querySelector("#vrc-red1 .team-auto-rate").innerHTML = match.red_1.auto_win_rate; 
 
     document.querySelector("#vrc-red2 .rank").innerHTML = match.red_2.rank;
@@ -121,7 +121,7 @@ function populate_vrc_score(match){
     document.querySelector("#vrc-red2 .team-name").innerHTML = match.red_2.name;
     document.querySelector("#vrc-red2 .team-loc").innerHTML = match.red_2.location;
     document.querySelector("#vrc-red2 .team-wp").innerHTML = match.red_2.wp;
-    document.querySelector("#vrc-red2 .team-awp").innerHTML = match.red_2.awp;
+    document.querySelector("#vrc-red2 .team-awp").innerHTML = match.red_2.awp_rate;
     document.querySelector("#vrc-red2 .team-auto-rate").innerHTML = match.red_2.auto_win_rate;
 
     document.querySelector("#vrc-blue1 .rank").innerHTML = match.blue_1.rank;
@@ -130,7 +130,7 @@ function populate_vrc_score(match){
     document.querySelector("#vrc-blue1 .team-name").innerHTML = match.blue_1.name;
     document.querySelector("#vrc-blue1 .team-loc").innerHTML = match.blue_1.location;
     document.querySelector("#vrc-blue1 .team-wp").innerHTML = match.blue_1.wp;
-    document.querySelector("#vrc-blue1 .team-awp").innerHTML = match.blue_1.awp;
+    document.querySelector("#vrc-blue1 .team-awp").innerHTML = match.blue_1.awp_rate;
     document.querySelector("#vrc-blue1 .team-auto-rate").innerHTML = match.blue_1.auto_win_rate; 
 
     document.querySelector("#vrc-blue2 .rank").innerHTML = match.blue_2.rank;
@@ -139,7 +139,7 @@ function populate_vrc_score(match){
     document.querySelector("#vrc-blue2 .team-name").innerHTML = match.blue_2.name;
     document.querySelector("#vrc-blue2 .team-loc").innerHTML = match.blue_2.location;
     document.querySelector("#vrc-blue2 .team-wp").innerHTML = match.blue_2.wp;
-    document.querySelector("#vrc-blue2 .team-awp").innerHTML = match.blue_2.awp;
+    document.querySelector("#vrc-blue2 .team-awp").innerHTML = match.blue_2.awp_rate;
     document.querySelector("#vrc-blue2 .team-auto-rate").innerHTML = match.blue_2.auto_win_rate; 
 
     if (match.red_1.seed){
@@ -180,7 +180,7 @@ function populate_vexu_score(match){
     document.querySelector("#vexu-red .team-name").innerHTML = match.red_1.name;
     document.querySelector("#vexu-red .team-loc").innerHTML = match.red_1.location;
     document.querySelector("#vexu-red .team-wp").innerHTML = match.red_1.wp;
-    document.querySelector("#vexu-red .team-awp").innerHTML = match.red_1.awp;
+    document.querySelector("#vexu-red .team-awp").innerHTML = match.red_1.awp_rate;
     document.querySelector("#vexu-red .team-auto-rate").innerHTML = match.red_1.auto_win_rate;
     
     document.querySelector("#vexu-blue .rank").innerHTML = match.blue_1.rank;
@@ -189,7 +189,7 @@ function populate_vexu_score(match){
     document.querySelector("#vexu-blue .team-name").innerHTML = match.blue_1.name;
     document.querySelector("#vexu-blue .team-loc").innerHTML = match.blue_1.location;
     document.querySelector("#vexu-blue .team-wp").innerHTML = match.blue_1.wp;
-    document.querySelector("#vexu-blue .team-awp").innerHTML = match.blue_1.awp;
+    document.querySelector("#vexu-blue .team-awp").innerHTML = match.blue_1.awp_rate;
     document.querySelector("#vexu-blue .team-auto-rate").innerHTML = match.blue_1.auto_win_rate;
 
     if (match.red_1.seed){
