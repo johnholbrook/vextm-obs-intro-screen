@@ -445,7 +445,7 @@ module.exports = class TMScraper {
             let awp_rate = (100 * (total_wp - win_wp) / (wins+losses+ties));
             awp_rate = isNumber(awp_rate) ? awp_rate.toFixed(0) : "0";
             
-            let num_auto_wins = Math.round(Number(cols[4].textContent) * (wins+losses+ties)) / 10;
+            let num_auto_wins = Math.round(Number(cols[4].textContent) * (wins+losses+ties)) / 8;
             let auto_win_rate = (100 * num_auto_wins / (wins+losses+ties));
             auto_win_rate = isNumber(auto_win_rate) ? auto_win_rate.toFixed(0) : "0";
 
