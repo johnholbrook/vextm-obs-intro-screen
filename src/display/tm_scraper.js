@@ -719,7 +719,7 @@ module.exports = class TMScraper {
      */
     buildLongMatchName(short_name){
         if (short_name.slice(0,2) == "QF") return short_name.replace("QF", "Quarterfinal");
-        if (short_name.slice(0,6) == "Finals") return short_name; // special case for ADC to avoid "Finalinals"
+        else if (short_name.slice(0,6) == "Finals") return short_name; // special case for ADC to avoid "Finalinals"
         else return short_name.replace("Q", "Qualification ")
                               .replace("R16", "Round of 16")
                               .replace("SF", "Semifinal")
