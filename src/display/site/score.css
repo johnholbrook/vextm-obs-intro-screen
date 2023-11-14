@@ -96,7 +96,7 @@ body{
 
 .team-area{
     flex: 1 0 auto;
-    /* width: 100%; */
+    width: 98%;
     padding-bottom: 1rem;
     margin: 0.5rem;
 }
@@ -120,6 +120,10 @@ body{
     flex-grow: 1;
     margin: auto 0;
     font-size: 2rem;
+}
+
+.team-name marquee{
+    vertical-align: bottom;
 }
 
 .team-loc{
@@ -149,7 +153,7 @@ body{
 
 .team-stats{
     font-size: 1.65rem;
-    min-width: 14rem;
+    min-width: 12rem;
     margin: auto 0;
     /* margin-left: 1rem; */
 }

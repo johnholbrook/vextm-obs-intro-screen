@@ -25,14 +25,29 @@ socket.on("match_time_updated", data => {
     }
 });
 
-/**
- * Generate the HTML source for a particular team
- * @param {Object} team The team to generate the HTML for
- */
-function generateTeamHTML(team) {
-    return `<strong>${team.number}</strong> ${team.name}
-    <br>
-    <small>${team.location}</small>`;
+let bio_line1_height = 0;
+document.addEventListener("DOMContentLoaded", () => {
+    // show_program("VRC");
+    setTimeout(() => {
+        bio_line1_height = document.querySelector("#vrc-red1 .bio-line1").offsetHeight;
+        console.log(bio_line1_height);
+    }, 100);
+    
+});
+
+function fill_team_bio(id, num, name, loc){
+    document.querySelector(`#${id} .team-num`).innerHTML = num;
+    document.querySelector(`#${id} .team-name`).innerHTML = name;
+    document.querySelector(`#${id} .team-loc`).innerHTML = loc;
+
+    if (document.querySelector(`#${id} .bio-line1`).offsetHeight > bio_line1_height){
+        // name wraps due to length, make it a marquee
+        document.querySelector(`#${id} .team-name`).innerHTML = `<marquee scrollamount="4">${`${name}<span class="px-4"></span>`.repeat(100)}</marquee>`;
+        let bio_width = document.querySelector(`#${id} .team-bio`).offsetWidth;
+        let num_width = document.querySelector(`#${id} .team-num`).offsetWidth;
+        // console.log(bio_width, num_width);
+        document.querySelector(`#${id} .team-name marquee`).style.maxWidth = `${(bio_width - num_width)*0.95}px` 
+    }
 }
 
 /**
@@ -42,9 +57,7 @@ function generateTeamHTML(team) {
  */
 function showVRCTeamInfo(teamid, info, show_stats){
     // show the team number/name/location
-    document.querySelector(`#vrc-${teamid} .team-num`).innerHTML = info.number;
-    document.querySelector(`#vrc-${teamid} .team-name`).innerHTML = info.name;
-    document.querySelector(`#vrc-${teamid} .team-loc`).innerHTML = info.location;
+    fill_team_bio(`vrc-${teamid}`, info.number, info.name, info.location);
 
     // show team ranking
     document.querySelector(`#vrc-${teamid} .team-rank`).innerHTML = info.rank;
@@ -88,9 +101,7 @@ function showVRCTeamInfo(teamid, info, show_stats){
  */
 function showRADCTeamInfo(teamid, info, show_stats, match_num){
     // show the team number/name/location
-    document.querySelector(`#radc-${teamid} .team-num`).innerHTML = info.number;
-    document.querySelector(`#radc-${teamid} .team-name`).innerHTML = info.name;
-    document.querySelector(`#radc-${teamid} .team-loc`).innerHTML = info.location;
+    fill_team_bio(`radc-${teamid}`, info.number, info.name, info.location);
 
     // show team ranking
     // document.querySelector(`#radc-${teamid} .team-rank`).innerHTML = info.rank;
@@ -127,9 +138,7 @@ function showRADCTeamInfo(teamid, info, show_stats, match_num){
  */
 function showVIQCTeamInfo(teamid, info, show_stats, match_num){
     // show the team number/name/location
-    document.querySelector(`#viqc-${teamid} .team-num`).innerHTML = info.number;
-    document.querySelector(`#viqc-${teamid} .team-name`).innerHTML = info.name;
-    document.querySelector(`#viqc-${teamid} .team-loc`).innerHTML = info.location;
+    fill_team_bio(`viqc-${teamid}`, info.number, info.name, info.location);
 
     // populate team ranking
     document.querySelector(`#viqc-${teamid} .team-rank`).innerHTML = info.rank;
@@ -167,9 +176,7 @@ function showVIQCTeamInfo(teamid, info, show_stats, match_num){
 function showVEXUTeamInfo(teamid, info, show_stats){
     // console.log(teamid);
     // show the team number/name/location
-    document.querySelector(`#vexu-${teamid} .team-num`).innerHTML = info.number;
-    document.querySelector(`#vexu-${teamid} .team-name`).innerHTML = info.name;
-    document.querySelector(`#vexu-${teamid} .team-loc`).innerHTML = info.location;
+    fill_team_bio(`vexu-${teamid}`, info.number, info.name, info.location);
 
     // show team ranking
     document.querySelector(`#vexu-${teamid} .team-rank`).innerHTML = info.rank;

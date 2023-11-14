@@ -31,9 +31,11 @@ em{
 
 .team-num{
     font-size: 1.8rem;
+    vertical-align: bottom;
 }
 .team-name{
     font-size: 1.8rem;
+    vertical-align: bottom;
 }
 .team-loc{
     font-size: 1.65rem;
@@ -147,8 +149,12 @@ hr.team-separator{
     /* width: 70%; */
     flex-grow: 1;
 }
+.team-name marquee{
+    vertical-align: bottom;
+}
 .team-stats{
     /* width: 30%; */
+    min-width: 12rem;
     font-size: 1.5rem;
     margin: auto 0;
 }
@@ -197,6 +203,7 @@ hr.team-separator{
 .team-area{
     flex: 1 0 auto;
     margin: 0.5rem;
+    width: 98%;
 }
 
 

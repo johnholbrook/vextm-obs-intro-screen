@@ -1,5 +1,14 @@
 const socket = io();
 
+let bio_line1_height = 0;
+document.addEventListener("DOMContentLoaded", () => {
+    show_program("VRC");
+    setTimeout(() => {
+        bio_line1_height = document.querySelector("#vrc-red1 .bio-line1").offsetHeight;
+        console.log(bio_line1_height);
+    }, 100);
+});
+
 socket.on("match_saved", data => {
     console.log(data);
     switch(data.program){
@@ -64,6 +73,21 @@ function show_program(program){
     }
 }
 
+function fill_team_bio(id, num, name, loc){
+    document.querySelector(`#${id} .team-num`).innerHTML = num;
+    document.querySelector(`#${id} .team-name`).innerHTML = name;
+    document.querySelector(`#${id} .team-loc`).innerHTML = loc;
+
+    if (document.querySelector(`#${id} .bio-line1`).offsetHeight > bio_line1_height){
+        // name wraps due to length, make it a marquee
+        document.querySelector(`#${id} .team-name`).innerHTML = `<marquee scrollamount="4">${`${name}<span class="px-4"></span>`.repeat(100)}</marquee>`;
+        let bio_width = document.querySelector(`#${id} .team-bio`).offsetWidth;
+        let num_width = document.querySelector(`#${id} .team-num`).offsetWidth;
+        // console.log(bio_width, num_width);
+        document.querySelector(`#${id} .team-name marquee`).style.maxWidth = `${(bio_width - num_width)*0.95}px` 
+    }
+}
+
 function populate_iq_score(match){
     show_program("VIQC");
 
@@ -72,17 +96,13 @@ function populate_iq_score(match){
     document.querySelector("#collab-score-value").innerHTML = match.scoring.score;
 
     document.querySelector("#iq-1 .rank").innerHTML = match.team_1.rank;
-    document.querySelector("#iq-1 .team-num").innerHTML = match.team_1.number;
-    document.querySelector("#iq-1 .team-name").innerHTML = match.team_1.name;
-    document.querySelector("#iq-1 .team-loc").innerHTML = match.team_1.location;
+    fill_team_bio("iq-1", match.team_1.number, match.team_1.name, match.team_1.location);
     document.querySelector("#iq-1 .team-high").innerHTML = match.team_1.high_score;
     document.querySelector("#iq-1 .team-avg").innerHTML = match.team_1.avg_score;
     document.querySelector("#iq-1 .team-skills").innerHTML = match.team_1.high_driving ? match.team_1.high_driving : 0;
 
     document.querySelector("#iq-2 .rank").innerHTML = match.team_2.rank;
-    document.querySelector("#iq-2 .team-num").innerHTML = match.team_2.number;
-    document.querySelector("#iq-2 .team-name").innerHTML = match.team_2.name;
-    document.querySelector("#iq-2 .team-loc").innerHTML = match.team_2.location;
+    fill_team_bio("iq-2", match.team_2.number, match.team_2.name, match.team_2.location);
     document.querySelector("#iq-2 .team-high").innerHTML = match.team_2.high_score;
     document.querySelector("#iq-2 .team-avg").innerHTML = match.team_2.avg_score;
     document.querySelector("#iq-2 .team-skills").innerHTML = match.team_2.high_driving ? match.team_2.high_driving : 0;
@@ -108,36 +128,28 @@ function populate_vrc_score(match){
 
     document.querySelector("#vrc-red1 .rank").innerHTML = match.red_1.rank;
     document.querySelector("#vrc-red1 .wlt").innerHTML = match.red_1.wlt;
-    document.querySelector("#vrc-red1 .team-num").innerHTML = match.red_1.number;
-    document.querySelector("#vrc-red1 .team-name").innerHTML = match.red_1.name;
-    document.querySelector("#vrc-red1 .team-loc").innerHTML = match.red_1.location;
+    fill_team_bio("vrc-red1", match.red_1.number, match.red_1.name, match.red_1.location);
     document.querySelector("#vrc-red1 .team-wp").innerHTML = match.red_1.wp;
     document.querySelector("#vrc-red1 .team-awp").innerHTML = match.red_1.awp_rate;
     document.querySelector("#vrc-red1 .team-auto-rate").innerHTML = match.red_1.auto_win_rate; 
 
     document.querySelector("#vrc-red2 .rank").innerHTML = match.red_2.rank;
     document.querySelector("#vrc-red2 .wlt").innerHTML = match.red_2.wlt;
-    document.querySelector("#vrc-red2 .team-num").innerHTML = match.red_2.number;
-    document.querySelector("#vrc-red2 .team-name").innerHTML = match.red_2.name;
-    document.querySelector("#vrc-red2 .team-loc").innerHTML = match.red_2.location;
+    fill_team_bio("vrc-red2", match.red_2.number, match.red_2.name, match.red_2.location);
     document.querySelector("#vrc-red2 .team-wp").innerHTML = match.red_2.wp;
     document.querySelector("#vrc-red2 .team-awp").innerHTML = match.red_2.awp_rate;
     document.querySelector("#vrc-red2 .team-auto-rate").innerHTML = match.red_2.auto_win_rate;
 
     document.querySelector("#vrc-blue1 .rank").innerHTML = match.blue_1.rank;
     document.querySelector("#vrc-blue1 .wlt").innerHTML = match.blue_1.wlt;
-    document.querySelector("#vrc-blue1 .team-num").innerHTML = match.blue_1.number;
-    document.querySelector("#vrc-blue1 .team-name").innerHTML = match.blue_1.name;
-    document.querySelector("#vrc-blue1 .team-loc").innerHTML = match.blue_1.location;
+    fill_team_bio("vrc-blue1", match.blue_1.number, match.blue_1.name, match.blue_1.location);
     document.querySelector("#vrc-blue1 .team-wp").innerHTML = match.blue_1.wp;
     document.querySelector("#vrc-blue1 .team-awp").innerHTML = match.blue_1.awp_rate;
     document.querySelector("#vrc-blue1 .team-auto-rate").innerHTML = match.blue_1.auto_win_rate; 
 
     document.querySelector("#vrc-blue2 .rank").innerHTML = match.blue_2.rank;
     document.querySelector("#vrc-blue2 .wlt").innerHTML = match.blue_2.wlt;
-    document.querySelector("#vrc-blue2 .team-num").innerHTML = match.blue_2.number;
-    document.querySelector("#vrc-blue2 .team-name").innerHTML = match.blue_2.name;
-    document.querySelector("#vrc-blue2 .team-loc").innerHTML = match.blue_2.location;
+    fill_team_bio("vrc-blue2", match.blue_2.number, match.blue_2.name, match.blue_2.location);
     document.querySelector("#vrc-blue2 .team-wp").innerHTML = match.blue_2.wp;
     document.querySelector("#vrc-blue2 .team-awp").innerHTML = match.blue_2.awp_rate;
     document.querySelector("#vrc-blue2 .team-auto-rate").innerHTML = match.blue_2.auto_win_rate; 
@@ -176,18 +188,14 @@ function populate_vexu_score(match){
 
     document.querySelector("#vexu-red .rank").innerHTML = match.red_1.rank;
     document.querySelector("#vexu-red .wlt").innerHTML = match.red_1.wlt;
-    document.querySelector("#vexu-red .team-num").innerHTML = match.red_1.number;
-    document.querySelector("#vexu-red .team-name").innerHTML = match.red_1.name;
-    document.querySelector("#vexu-red .team-loc").innerHTML = match.red_1.location;
+    fill_team_bio("vexu-red", match.red_1.number, match.red_1.name, match.red_1.location);
     document.querySelector("#vexu-red .team-wp").innerHTML = match.red_1.wp;
     document.querySelector("#vexu-red .team-awp").innerHTML = match.red_1.awp_rate;
     document.querySelector("#vexu-red .team-auto-rate").innerHTML = match.red_1.auto_win_rate;
     
     document.querySelector("#vexu-blue .rank").innerHTML = match.blue_1.rank;
     document.querySelector("#vexu-blue .wlt").innerHTML = match.blue_1.wlt;
-    document.querySelector("#vexu-blue .team-num").innerHTML = match.blue_1.number;
-    document.querySelector("#vexu-blue .team-name").innerHTML = match.blue_1.name;
-    document.querySelector("#vexu-blue .team-loc").innerHTML = match.blue_1.location;
+    fill_team_bio("vexu-blue", match.blue_1.number, match.blue_1.name, match.blue_1.location);
     document.querySelector("#vexu-blue .team-wp").innerHTML = match.blue_1.wp;
     document.querySelector("#vexu-blue .team-awp").innerHTML = match.blue_1.awp_rate;
     document.querySelector("#vexu-blue .team-auto-rate").innerHTML = match.blue_1.auto_win_rate;
@@ -220,16 +228,12 @@ function populate_radc_score(match){
     document.querySelector("#collab-score-value").innerHTML = match.scoring.score;
 
     document.querySelector("#radc-red .rank").innerHTML = match.red.rank;
-    document.querySelector("#radc-red .team-num").innerHTML = match.red.number;
-    document.querySelector("#radc-red .team-name").innerHTML = match.red.name;
-    document.querySelector("#radc-red .team-loc").innerHTML = match.red.location;
+    fill_team_bio("radc-red", match.red.number, match.red.name, match.red.location);
     document.querySelector("#radc-red .team-max").innerHTML = match.red.high_score;
     document.querySelector("#radc-red .team-avg").innerHTML = match.red.avg_score;
 
     document.querySelector("#radc-blue .rank").innerHTML = match.blue.rank;
-    document.querySelector("#radc-blue .team-num").innerHTML = match.blue.number;
-    document.querySelector("#radc-blue .team-name").innerHTML = match.blue.name;
-    document.querySelector("#radc-blue .team-loc").innerHTML = match.blue.location;
+    fill_team_bio("radc-blue", match.blue.number, match.blue.name, match.blue.location);
     document.querySelector("#radc-blue .team-max").innerHTML = match.blue.high_score;
     document.querySelector("#radc-blue .team-avg").innerHTML = match.blue.avg_score;
 
